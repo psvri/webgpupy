@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Setup Environment
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -f -y libegl1-mesa-dev
+          sudo apt install -f -y mesa-vulkan-drivers
+          rustup update
+      - name: Set up cargo nexttest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
+      - name: rust cargo tests
+        run: |
+          cargo nextest run --status-level all --no-fail-fast
+      - name: Setup python env
+        working-directory: crates/wgpy_pyo3
+        run: |
+          pip install ".[dev]" --force-reinstall
+      - name: pytest
+        working-directory: crates/wgpy_pyo3
+        run: |
+          pytest -v -n auto
+
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: PyO3/maturin-action@v1
+  #       with:
+  #         command: build
+  #         args: --release -o dist --find-interpreter
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: dist
+
+  # macos:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: PyO3/maturin-action@v1
+  #       with:
+  #         command: build
+  #         args: --release -o dist --universal2 --find-interpreter
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: dist
+
+#
+#  release:
+#    name: Release
+#    runs-on: ubuntu-latest
+#    if: "startsWith(github.ref, 'refs/tags/')"
+#    needs: [ macos, windows, linux ]
+#    steps:
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: wheels
+#      - name: Publish to PyPI
+#        uses: PyO3/maturin-action@v1
+#        env:
+#          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+#        with:
+#          command: upload
+#          args: --skip-existing *
