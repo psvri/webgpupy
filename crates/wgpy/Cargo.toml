@@ -1,0 +1,10 @@
+[package]
+name = "webgpupy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+webgpupy_core = {path="../wgpy_core"}
+webgpupy_math = {path="../wgpy_math"}

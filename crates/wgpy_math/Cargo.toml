@@ -1,0 +1,15 @@
+[package]
+name = "webgpupy_math"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+webgpupy_core = {path="../wgpy_core"}
+arrow_gpu = {workspace=true}
+futures = {workspace = true}
+
+[dev-dependencies]
+tokio = { workspace = true }
+test_utils = {path = "../test_utils"}
