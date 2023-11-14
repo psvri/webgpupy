@@ -19,26 +19,41 @@ jobs:
       - name: Setup Environment
         shell: bash
         run: |
-          sudo apt update
-          sudo apt install -f -y libegl1-mesa-dev
-          sudo apt install -f -y mesa-vulkan-drivers
+          sudo apt-fast update
+          sudo apt-fast install -f -y mesa-vulkan-drivers libegl1-mesa-dev
           rustup update
-      - name: Set up cargo nexttest
+      - name: Set up nextest and llvm-cov
         uses: taiki-e/install-action@v2
         with:
-          tool: nextest
+          tool: nextest,cargo-llvm-cov
       - uses: Swatinem/rust-cache@v2
       - name: rust cargo tests
         run: |
+          source <(cargo llvm-cov show-env --export-prefix)
+          export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
+          export CARGO_INCREMENTAL=1
+          cargo llvm-cov clean --workspace
           cargo nextest run --status-level all --no-fail-fast
-      - name: Setup python env
+      - name: python test
         working-directory: crates/wgpy_pyo3
         run: |
-          pip install ".[dev]" --force-reinstall
-      - name: pytest
-        working-directory: crates/wgpy_pyo3
+          python --version
+          source <(cargo llvm-cov show-env --export-prefix)
+          export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
+          export CARGO_INCREMENTAL=1
+          pip install -r requirements-dev.txt
+          maturin build --out dist --find-interpreter
+          pip install webgpupy --find-links dist --force-reinstall
+          pytest -v -n auto --cov=webgpupy --cov-report xml
+      - name: create lcov
         run: |
-          pytest -v -n auto
+          source <(cargo llvm-cov show-env --export-prefix)
+          cargo llvm-cov --no-run --lcov --output-path coverage.lcov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.lcov,crates/wgpy_pyo3/coverage.xml
 
   # windows:
   #   runs-on: windows-latest
@@ -67,7 +82,6 @@ jobs:
   #       with:
   #         name: wheels
   #         path: dist
-
 #
 #  release:
 #    name: Release
