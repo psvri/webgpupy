@@ -41,6 +41,7 @@ jobs:
           source <(cargo llvm-cov show-env --export-prefix)
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
+          pip install -r requirements-dev.txt
           maturin build --out dist --find-interpreter
           pip install webgpupy --find-links dist --force-reinstall
           pytest -v -n auto --cov=webgpupy --cov-report xml
