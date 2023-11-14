@@ -19,11 +19,10 @@ jobs:
       - name: Setup Environment
         shell: bash
         run: |
-          sudo apt update
-          sudo apt install -f -y libegl1-mesa-dev
-          sudo apt install -f -y mesa-vulkan-drivers
+          sudo apt-fast update
+          sudo apt-fast install -f -y mesa-vulkan-drivers libegl1-mesa-dev
           rustup update
-      - name: Set up cargo nexttest
+      - name: Set up nextest and llvm-cov
         uses: taiki-e/install-action@v2
         with:
           tool: nextest,cargo-llvm-cov
@@ -34,7 +33,7 @@ jobs:
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
           cargo llvm-cov clean --workspace
-          cargo llvm-cov nextest --status-level all --no-fail-fast
+          cargo nextest --status-level all --no-fail-fast
       - name: python test
         working-directory: crates/wgpy_pyo3
         run: |
