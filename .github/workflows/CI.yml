@@ -34,20 +34,15 @@ jobs:
           export CARGO_INCREMENTAL=1
           cargo llvm-cov clean --workspace
           cargo nextest run --status-level all --no-fail-fast
-      - name: Setup virtual environment
-        working-directory: crates/wgpy_pyo3
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements-dev.txt
       - name: python test
         working-directory: crates/wgpy_pyo3
         run: |
-          source venv/bin/activate
+          python --version
           source <(cargo llvm-cov show-env --export-prefix)
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
-          maturin develop
+          maturin build --out dist --find-interpreter
+          pip install webgpupy --find-links dist --force-reinstall
           pytest -v -n auto --cov=webgpupy --cov-report xml
       - name: create lcov
         run: |
