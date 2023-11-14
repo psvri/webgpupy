@@ -32,6 +32,7 @@ jobs:
           source <(cargo llvm-cov show-env --export-prefix)
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
+          echo $CARGO_LLVM_COV_TARGET_DIR
           cargo llvm-cov clean --workspace
           cargo nextest run --status-level all --no-fail-fast
       - name: python test
@@ -40,11 +41,15 @@ jobs:
           source <(cargo llvm-cov show-env --export-prefix)
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
-          pip install ".[dev]" --force-reinstall
+          export CARGO_TERM_VERBOSE=true
+          export CARGO_TERM_COLOR=never
+          echo $CARGO_LLVM_COV_TARGET_DIR
+          pip install -v ".[dev]" --force-reinstall
           pytest -v -n auto --cov=webgpupy --cov-report xml
       - name: create lcov
         run: |
           source <(cargo llvm-cov show-env --export-prefix)
+          echo $CARGO_LLVM_COV_TARGET_DIR
           cargo llvm-cov --no-run --lcov --output-path coverage.lcov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
