@@ -41,7 +41,7 @@ jobs:
           export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
           export CARGO_INCREMENTAL=1
           pip install ".[dev]" --force-reinstall
-          pytest -v -n auto
+          pytest -v -n auto --cov=webgpupy --cov-report xml
       - name: create lcov
         run: |
           source <(cargo llvm-cov show-env --export-prefix)
@@ -50,7 +50,7 @@ jobs:
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.lcov
+          files: coverage.lcov,crates/wgpy_pyo3/coverage.xml
 
   # windows:
   #   runs-on: windows-latest
