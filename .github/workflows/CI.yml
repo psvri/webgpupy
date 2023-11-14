@@ -44,6 +44,7 @@ jobs:
           pytest -v -n auto
       - name: create lcov
         run: |
+          source <(cargo llvm-cov show-env --export-prefix)
           cargo llvm-cov --no-run --lcov --output-path coverage.lcov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
