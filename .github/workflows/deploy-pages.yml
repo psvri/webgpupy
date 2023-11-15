@@ -4,9 +4,11 @@ on:
     branches:
       - main
     paths:
-      - 'crates/wgpy_pyo3'
+      - "crates/wgpy_pyo3"
   workflow_dispatch:
-    
+
+permissions:
+  pages: write
 
 jobs:
   deploy:
