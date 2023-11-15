@@ -20,6 +20,8 @@ jobs:
           cache: "pip"
           cache-dependency-path: "**/requirements*.txt"
       - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "gh-pages-rust"
       - name: Deploy GitHub Pages
         working-directory: crates/wgpy_pyo3
         run: |
@@ -34,8 +36,7 @@ jobs:
           # Delete the ref to avoid keeping history.
           git update-ref -d refs/heads/gh-pages
           rm -rf *
-          mv ../docs/build/html/* .
-          mv ../docs/build/html/.* .
+          mv ../docs/build/html/{.,}* .
           git add .
           git commit -m "Deploy $GITHUB_SHA to gh-pages"
           git push --force --set-upstream origin gh-pages
