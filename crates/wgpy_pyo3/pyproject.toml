@@ -21,4 +21,5 @@ where = ["python"]
 mypkg = ["*.md"]
 
 [tool.pytest.ini_options]
-testpaths = ["wp_tests"]
+testpaths = ["wp_tests", "python/webgpupy/python_doc/"]
+addopts = "--doctest-glob=\"*.rst\""

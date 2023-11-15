@@ -12,7 +12,8 @@ use crate::{
     types::{into_dtypepy, into_optional_dtypepy, DtypePy},
 };
 
-#[pyclass(frozen)]
+/// N-dimentional array
+#[pyclass(name = "ndarray", frozen)]
 #[derive(Debug)]
 pub struct NdArrayPy {
     pub ndarray: NdArray,
@@ -36,6 +37,7 @@ impl NdArrayPy {
         format!("Shape {:?} \n {:?}", self.ndarray.shape, self.ndarray.data)
     }
 
+    #[doc = include_str!("../python/webgpupy/python_doc/ndarray.tolist.rst")]
     pub fn tolist(&self, py: Python<'_>) -> Py<PyAny> {
         let values = self.ndarray.data.get_raw_values().block_on();
 
@@ -58,6 +60,7 @@ impl NdArrayPy {
         NdArrayPy { ndarray: new_array }.into_py(py)
     }
 
+    /// Shape of ndarry
     #[getter]
     pub fn shape(&self) -> PyResult<Vec<u32>> {
         Ok(self.ndarray.shape.clone())
