@@ -6,6 +6,8 @@ on:
     paths:
       - 'crates/wgpy_pyo3/docs'
       - 'crates/wgpy_pyo3/python/webgpupy/python_doc'
+  workflow_dispatch:
+    
 
 jobs:
   deploy:
