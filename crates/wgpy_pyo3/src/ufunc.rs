@@ -40,6 +40,10 @@ impl Ufunc {
     ) -> PyResult<PyObject> {
         self.py_func.call(py, args, kwargs)
     }
+
+    fn __repr__(&self) -> String {
+        format!("<ufunc webgpupy_{}>", self.function_name)
+    }
 }
 
 macro_rules! add_ufunc_nin1_nout1 {
@@ -47,7 +51,7 @@ macro_rules! add_ufunc_nin1_nout1 {
         let py_fn = $m.getattr(concat!("_", $name))?.into();
         let ufunc_function = Ufunc {
             function_name: $name,
-            doc_string_path: concat!($name, ".md"),
+            doc_string_path: concat!("python_doc/", $name, ".rst"),
             nin: 1,
             nout: 1,
             ntypes: 1,

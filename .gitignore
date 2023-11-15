@@ -1,5 +1,7 @@
 /target
 /del
+coverage.lcov
+coverage.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -62,6 +64,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+**/source/**/generated/
 
 # PyCharm
 .idea/

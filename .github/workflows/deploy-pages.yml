@@ -1,0 +1,40 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'crates/wgpy_pyo3/docs'
+      - 'crates/wgpy_pyo3/python/webgpupy/python_doc'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "**/requirements*.txt"
+      - uses: Swatinem/rust-cache@v2
+      - name: Deploy GitHub Pages
+        working-directory: crates/wgpy_pyo3
+        run: |
+          pip install -r requirements-dev.txt
+          maturin build --out dist --find-interpreter
+          pip install webgpupy --find-links dist --force-reinstall
+          sphinx-build -b html docs/source/ docs/build/html
+          git worktree add gh-pages
+          git config user.name "Deploy from CI"
+          git config user.email ""
+          cd gh-pages
+          # Delete the ref to avoid keeping history.
+          git update-ref -d refs/heads/gh-pages
+          rm -rf *
+          mv ../docs/build/html/* .
+          git add .
+          git commit -m "Deploy $GITHUB_SHA to gh-pages"
+          git push --force --set-upstream origin gh-pages
