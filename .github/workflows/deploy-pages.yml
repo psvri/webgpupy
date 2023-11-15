@@ -4,8 +4,7 @@ on:
     branches:
       - main
     paths:
-      - 'crates/wgpy_pyo3/docs'
-      - 'crates/wgpy_pyo3/python/webgpupy/python_doc'
+      - 'crates/wgpy_pyo3'
   workflow_dispatch:
     
 
