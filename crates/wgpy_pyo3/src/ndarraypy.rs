@@ -79,7 +79,7 @@ impl NdArrayPy {
     pub fn flatten(&self, py: Python<'_>) -> PyResult<Self> {
         py.allow_threads(|| {
             let mut new_array = self.ndarray.clone_array().block_on();
-            new_array.shape = vec![(&new_array.shape).iter().map(|x| *x).product()];
+            new_array.shape = vec![(new_array.shape).iter().copied().product()];
             Ok(NdArrayPy { ndarray: new_array })
         })
     }
@@ -97,9 +97,7 @@ pub fn array_ones(
             Some(x) => &x.as_ref().dtype,
             None => &Dtype::Float32,
         };
-        ones(shape, Some((*array_type).into()), None)
-            .block_on()
-            .into()
+        ones(shape, Some(*array_type), None).block_on().into()
     })
 }
 
@@ -115,9 +113,7 @@ pub fn array_zeros(
             Some(x) => &x.as_ref().dtype,
             None => &Dtype::Float32,
         };
-        zeros(shape, Some((*array_type).into()), None)
-            .block_on()
-            .into()
+        zeros(shape, Some(*array_type), None).block_on().into()
     })
 }
 
@@ -144,7 +140,7 @@ pub fn array_full(
     })
 }
 
-pub fn get_shape<'a>(data: &'a PyAny) -> PyResult<Vec<u32>> {
+pub fn get_shape(data: &PyAny) -> PyResult<Vec<u32>> {
     if data.is_instance_of::<PyList>() {
         let mut shape = vec![];
         shape.push(data.len()? as u32);
@@ -162,7 +158,7 @@ pub fn get_shape<'a>(data: &'a PyAny) -> PyResult<Vec<u32>> {
     }
 }
 
-pub fn get_type<'a>(data: &'a PyAny) -> PyResult<Dtype> {
+pub fn get_type(data: &PyAny) -> PyResult<Dtype> {
     if data.is_instance_of::<PyList>() {
         get_type(data.get_item(0)?)
     } else if data.is_instance_of::<PyBool>() {
@@ -178,8 +174,8 @@ pub fn get_type<'a>(data: &'a PyAny) -> PyResult<Dtype> {
     }
 }
 
-pub fn flatten<'a, T: PyObectToRustPrimitive>(
-    data: &'a PyAny,
+pub fn flatten<T: PyObectToRustPrimitive>(
+    data: &PyAny,
     shape: &[u32],
     depth: usize,
 ) -> PyResult<Vec<T>> {
@@ -207,7 +203,7 @@ pub fn flatten<'a, T: PyObectToRustPrimitive>(
     }
 }
 
-pub fn into_scalar_array<'a>(data: &'a PyAny, dtype: Dtype) -> PyResult<NdArrayPy> {
+pub fn into_scalar_array(data: &PyAny, dtype: Dtype) -> PyResult<NdArrayPy> {
     let shape = get_shape(data)?;
 
     match dtype {

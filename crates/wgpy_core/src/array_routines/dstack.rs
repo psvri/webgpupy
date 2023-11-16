@@ -32,7 +32,6 @@ fn validate_and_genereate_new_shapes(tup: &[&NdArray]) -> Vec<Vec<u32>> {
         new_shapes.push(recast_shape(&tup[i].shape));
     }
 
-
     new_shapes
 }
 
@@ -69,9 +68,8 @@ pub async fn dstack(tup: &[&NdArray]) -> NdArray {
         let mut last_dimension = 0;
         for array in tup {
             let count = array.shape.iter().product();
-            let src_indexes = (0..count).into_iter().collect::<Vec<u32>>();
+            let src_indexes = (0..count).collect::<Vec<u32>>();
             let dst_indexes = (0..count)
-                .into_iter()
                 .map(|x| last_dimension + (x * last_dimension_size))
                 .collect::<Vec<u32>>();
             let src_indexes_gpu = UInt32ArrayGPU::from_vec(&src_indexes, device.clone());

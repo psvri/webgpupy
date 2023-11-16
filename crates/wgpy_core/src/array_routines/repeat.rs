@@ -29,11 +29,10 @@ fn generate_repeat_indexes(
 ) {
     if depth as usize == shape.len() - 1 {
         for i in 0..shape[shape.len() - 1] {
-            indexes.push(*base_index + (i as u32));
+            indexes.push(*base_index + i);
             if axis == depth {
                 (0..(repeats[i as usize % repeats.len()] - 1))
-                    .into_iter()
-                    .for_each(|_| indexes.push(*base_index + (i as u32)));
+                    .for_each(|_| indexes.push(*base_index + i));
             }
         }
         *base_index += shape[shape.len() - 1];
@@ -44,7 +43,6 @@ fn generate_repeat_indexes(
             let new_count = indexes.len();
             if axis == depth {
                 (0..(repeats[i as usize % repeats.len()] - 1))
-                    .into_iter()
                     .for_each(|_| indexes.extend_from_within(old_count..new_count));
             }
         }

@@ -13,3 +13,4 @@ Index
    :maxdepth: 2
 
    reference/index
+   examples/index

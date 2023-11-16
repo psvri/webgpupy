@@ -1,9 +1,9 @@
+pub mod arithmetic;
 pub(crate) mod cast;
 pub mod ndarraypy;
 pub mod trigonometry;
 pub mod types;
 pub mod ufunc;
-pub mod arithmetic;
 
 use ndarraypy::NdArrayPy;
 use pollster::FutureExt;
@@ -11,7 +11,7 @@ use pyo3::{exceptions::PyTypeError, prelude::*, types::*};
 use types::OperandPy;
 use webgpupy::{NdArray, ScalarValue};
 
-pub(crate) fn convert_pyobj_into_operand<'a>(data: &'a PyAny) -> PyResult<OperandPy<'a>> {
+pub(crate) fn convert_pyobj_into_operand(data: &PyAny) -> PyResult<OperandPy> {
     if data.is_instance_of::<NdArrayPy>() {
         let ndarray: &PyCell<NdArrayPy> = data.downcast()?;
         PyResult::Ok((&ndarray.get().ndarray).into())
@@ -30,7 +30,7 @@ pub(crate) fn convert_pyobj_into_operand<'a>(data: &'a PyAny) -> PyResult<Operan
     }
 }
 
-pub(crate) fn convert_pyobj_into_scalar<'a>(data: &'a PyAny) -> PyResult<ScalarValue> {
+pub(crate) fn convert_pyobj_into_scalar(data: &PyAny) -> PyResult<ScalarValue> {
     if data.is_instance_of::<PyFloat>() {
         PyResult::Ok(data.extract::<f32>()?.into())
     } else if data.is_instance_of::<PyInt>() {
@@ -42,7 +42,7 @@ pub(crate) fn convert_pyobj_into_scalar<'a>(data: &'a PyAny) -> PyResult<ScalarV
     }
 }
 
-pub(crate) fn convert_pyobj_into_array_u32<'a>(data: &'a PyAny) -> PyResult<Vec<u32>> {
+pub(crate) fn convert_pyobj_into_array_u32(data: &PyAny) -> PyResult<Vec<u32>> {
     if data.is_instance_of::<PyInt>() {
         PyResult::Ok(vec![data.extract::<u32>()?])
     } else if data.is_instance_of::<PyList>() {
@@ -54,7 +54,7 @@ pub(crate) fn convert_pyobj_into_array_u32<'a>(data: &'a PyAny) -> PyResult<Vec<
     }
 }
 
-pub(crate) fn convert_pyobj_into_vec_ndarray<'a>(data: &'a PyAny) -> PyResult<Vec<&'a NdArray>> {
+pub(crate) fn convert_pyobj_into_vec_ndarray(data: &PyAny) -> PyResult<Vec<&NdArray>> {
     if data.is_instance_of::<PyList>() || data.is_instance_of::<PyTuple>() {
         let len = data.len()?;
 
