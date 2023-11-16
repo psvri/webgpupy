@@ -23,7 +23,7 @@ jobs:
       - name: Deploy GitHub Pages
         working-directory: crates/wgpy_pyo3
         run: |
-          apt install pandoc -y
+          sudo apt install pandoc -y
           pip install -r requirements-dev.txt
           maturin build --out dist --find-interpreter
           pip install webgpupy --find-links dist --force-reinstall
