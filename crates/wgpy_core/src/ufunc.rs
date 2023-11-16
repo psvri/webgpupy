@@ -28,7 +28,7 @@ where
                 ndarray.data.get_gpu_device(),
             )
             .await;
-            new_gpu_array = merge_dyn(&new_gpu_array, &zero_array, &mask).await;
+            new_gpu_array = merge_dyn(&new_gpu_array, &zero_array, mask).await;
         }
     }
 
@@ -40,7 +40,7 @@ where
 
     NdArray {
         shape: ndarray.shape.clone(),
-        dims: ndarray.dims.clone(),
+        dims: ndarray.dims,
         data: new_gpu_array,
         dtype,
     }
@@ -68,7 +68,7 @@ where
 
     if let Some(mask) = where_ {
         if let ArrowArrayGPU::BooleanArrayGPU(mask) = &mask.data {
-            new_gpu_array = merge_dyn(&new_gpu_array, &in2.data, &mask).await;
+            new_gpu_array = merge_dyn(&new_gpu_array, &in2.data, mask).await;
         }
     }
 

@@ -85,9 +85,9 @@ impl NdArray {
 
     pub fn len(&self) -> u32 {
         if self.shape.len() == 0 {
-            return 0;
+            0
         } else {
-            return self.shape.iter().product();
+            self.shape.iter().product()
         }
     }
 

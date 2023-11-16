@@ -22,6 +22,7 @@ extensions = [
     # Third-party extensions
     'numpydoc',
     'sphinx_copybutton',
+    'nbsphinx',
 ]
 
 templates_path = ['_templates']

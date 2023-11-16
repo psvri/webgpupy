@@ -13,9 +13,9 @@ use pyo3::prelude::*;
 /// Performs cos of ndarray
 #[pyfunction]
 #[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
-pub fn _cos<'a>(
+pub fn _cos(
     py: Python<'_>,
-    x: &'a PyAny,
+    x: &PyAny,
     r#where: Option<&NdArrayPy>,
     #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
 ) -> NdArrayPy {
@@ -32,9 +32,9 @@ pub fn _cos<'a>(
 /// Performs sin of ndarray
 #[pyfunction]
 #[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
-pub fn _sin<'a>(
+pub fn _sin(
     py: Python<'_>,
-    x: &'a PyAny,
+    x: &PyAny,
     r#where: Option<&NdArrayPy>,
     #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
 ) -> NdArrayPy {

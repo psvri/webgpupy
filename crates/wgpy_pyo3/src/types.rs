@@ -23,11 +23,11 @@ pub enum ScalarValuePy {
 impl<'s> FromPyObject<'s> for ScalarValuePy {
     fn extract(ob: &'s PyAny) -> PyResult<Self> {
         if ob.is_instance_of::<PyBool>() {
-            PyResult::Ok(Self::BOOL(ob.extract::<bool>().unwrap()).into())
+            PyResult::Ok(Self::BOOL(ob.extract::<bool>().unwrap()))
         } else if let Ok(value) = ob.extract::<i32>() {
-            PyResult::Ok(Self::I32(value).into())
+            PyResult::Ok(Self::I32(value))
         } else if let Ok(value) = ob.extract::<f32>() {
-            PyResult::Ok(Self::F32(value).into())
+            PyResult::Ok(Self::F32(value))
         } else {
             PyResult::Err(PyTypeError::new_err("Invalid scalar value type"))
         }
@@ -55,8 +55,8 @@ pub enum OperandPy<'a> {
 impl AsRef<NdArray> for OperandPy<'_> {
     fn as_ref(&self) -> &NdArray {
         match self {
-            OperandPy::NdArrayRef(x) => *x,
-            OperandPy::NdArrayOwned(x) => &x,
+            OperandPy::NdArrayRef(x) => x,
+            OperandPy::NdArrayOwned(x) => x,
         }
     }
 }

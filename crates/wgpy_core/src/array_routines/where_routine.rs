@@ -12,12 +12,12 @@ pub async fn where_(mask: &NdArray, x: &NdArray, y: &NdArray) -> NdArray {
             broadcast_shape(&mask.shape, &broadcast_shape(&x.shape, &y.shape).unwrap()).unwrap();
         let broadcasted_x = broadcast_to(x, &broadcast_shape).await;
         let broadcasted_y = broadcast_to(y, &broadcast_shape).await;
-        let merged_array = merge_dyn(&broadcasted_x.data, &broadcasted_y.data, &bool_mask).await;
+        let merged_array = merge_dyn(&broadcasted_x.data, &broadcasted_y.data, bool_mask).await;
         NdArray {
             shape: x.shape.clone(),
             dims: x.dims,
             data: merged_array,
-            dtype: x.dtype.clone(),
+            dtype: x.dtype,
         }
     } else {
         panic!("Mask is not of boolean type")
