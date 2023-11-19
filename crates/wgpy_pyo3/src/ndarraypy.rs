@@ -228,7 +228,8 @@ fn slice_to_index(
 
 fn slice_to_index_slice(subscripts: &PyAny, length: i32) -> PyResult<IndexSlice> {
     let slice = subscripts.downcast::<PySlice>()?;
-    let indices = slice.indices(length)?;
+    // if .into is not called, its failing in CI :(
+    let indices = slice.indices(length.into())?;
     Ok(IndexSlice::new(
         indices.start as i64,
         indices.stop as i64,
