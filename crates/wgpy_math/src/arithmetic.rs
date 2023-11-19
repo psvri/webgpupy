@@ -1,18 +1,7 @@
-use arrow_gpu::kernels::mul_dyn;
-use webgpupy_core::{ufunc_nin2_nout1, Dtype, NdArray};
+use arrow_gpu::kernels::*;
+use webgpupy_core::{ufunc_nin2_nout1, ufunc_nin2_nout1_body, Dtype, NdArray};
 
-pub async fn multiply(
-    input1: &NdArray,
-    input2: &NdArray,
-    where_: Option<&NdArray>,
-    dtype: Option<Dtype>,
-) -> NdArray {
-    ufunc_nin2_nout1(
-        |x, y| Box::pin(mul_dyn(x, y)),
-        input1,
-        input2,
-        where_,
-        dtype,
-    )
-    .await
-}
+ufunc_nin2_nout1_body!(multiply, mul_dyn);
+ufunc_nin2_nout1_body!(divide, div_dyn);
+ufunc_nin2_nout1_body!(add, add_dyn);
+ufunc_nin2_nout1_body!(subtract, sub_dyn);

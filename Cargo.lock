@@ -46,13 +46,14 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 [[package]]
 name = "arrow_gpu"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_arithmetic",
  "arrow_gpu_array",
  "arrow_gpu_cast",
  "arrow_gpu_compare",
  "arrow_gpu_logical",
+ "arrow_gpu_math",
  "arrow_gpu_routines",
  "arrow_gpu_trigonometry",
 ]
@@ -60,7 +61,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_arithmetic"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -69,7 +70,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_array"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "async-trait",
  "bytemuck",
@@ -84,7 +85,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_cast"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -94,7 +95,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_compare"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -104,7 +105,17 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_logical"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+dependencies = [
+ "arrow_gpu_array",
+ "async-trait",
+ "wgpu",
+]
+
+[[package]]
+name = "arrow_gpu_math"
+version = "0.1.0"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -114,7 +125,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_routines"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -124,7 +135,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_trigonometry"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=679763946f4c67bb2be5576ca71d602762adb35f#679763946f4c67bb2be5576ca71d602762adb35f"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -1084,9 +1095,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.33.0"
+version = "1.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f38200e3ef7995e5ef13baec2f432a6da0aa9ac495b2c0e8f3b7eec2c92d653"
+checksum = "d0c014766411e834f7af5b8f4cf46257aab4036ca95e9d2c144a10f59ad6f5b9"
 dependencies = [
  "backtrace",
  "num_cpus",
@@ -1096,9 +1107,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "2.1.0"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "630bdcf245f78637c13ec01ffae6187cca34625e8c63150d424b59e55af2675e"
+checksum = "5b8a1e28f2deaa14e508979454cb3a223b10b938b45af148bc0986de36f1923b"
 dependencies = [
  "proc-macro2",
  "quote",

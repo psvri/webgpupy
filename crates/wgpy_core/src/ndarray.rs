@@ -5,7 +5,7 @@ use arrow_gpu::{
         broadcast_dyn, ArrowArrayGPU, BooleanArrayGPU, Float32ArrayGPU, GpuDevice, Int16ArrayGPU,
         Int32ArrayGPU, Int8ArrayGPU, UInt16ArrayGPU, UInt32ArrayGPU, UInt8ArrayGPU,
     },
-    kernels::cast_dyn,
+    kernels::{cast_dyn, take_dyn},
 };
 
 use crate::{Dtype, Operand, ScalarArrayRef, ScalarValue, GPU_DEVICE};
@@ -97,6 +97,24 @@ impl NdArray {
             dims: self.dims,
             data: self.data.clone_array().await,
             dtype: self.dtype,
+        }
+    }
+
+    pub async fn take(&self, indices: &NdArray, axis: Option<u32>) -> Self {
+        if let Some(_) = axis {
+            todo!()
+        } else {
+            if let ArrowArrayGPU::UInt32ArrayGPU(indices_array) = &indices.data {
+                let array = take_dyn(&self.data, &indices_array).await;
+                Self {
+                    shape: vec![array.len() as u32],
+                    dims: 1u16,
+                    data: array,
+                    dtype: self.dtype,
+                }
+            } else {
+                unreachable!()
+            }
         }
     }
 

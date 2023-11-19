@@ -46,6 +46,51 @@ impl Ufunc {
     }
 }
 
+#[macro_export]
+macro_rules! impl_ufunc_nin2_nout1 {
+    ($name: ident, $fn_name: expr) => {
+        #[pyfunction]
+        #[pyo3(signature = (x, y, /, *, r#where = None, dtype=None))]
+        pub fn $name<'a>(
+            py: Python<'_>,
+            x: &'a PyAny,
+            y: &'a PyAny,
+            r#where: Option<&NdArrayPy>,
+            #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
+        ) -> NdArrayPy {
+            let x = convert_pyobj_into_operand(x).unwrap();
+            let y = convert_pyobj_into_operand(y).unwrap();
+            let where_ = r#where.map(|x| x.into());
+            let dtype = dtype.map(|x| x.as_ref().dtype);
+            py.allow_threads(|| {
+                $fn_name(x.as_ref(), y.as_ref(), where_, dtype)
+                    .block_on()
+                    .into()
+            })
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_ufunc_nin1_nout1 {
+    ($name: ident, $fn_name: expr) => {
+        #[pyfunction]
+        #[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
+        pub fn $name(
+            py: Python<'_>,
+            x: &PyAny,
+            r#where: Option<&NdArrayPy>,
+            #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
+        ) -> NdArrayPy {
+            let data = convert_pyobj_into_operand(x).unwrap();
+            let where_ = r#where.map(|x| x.into());
+            let dtype = dtype.map(|x| x.as_ref().dtype);
+            py.allow_threads(|| $fn_name(data.as_ref(), where_, dtype).block_on().into())
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! add_ufunc_nin1_nout1 {
     ($m: ident, $name: literal) => {
         let py_fn = $m.getattr(concat!("_", $name))?.into();
@@ -65,6 +110,7 @@ macro_rules! add_ufunc_nin1_nout1 {
     };
 }
 
+#[macro_export]
 macro_rules! add_ufunc_nin2_nout1 {
     ($m: ident, $name: literal) => {
         let py_fn = $m.getattr(concat!("_", $name))?.into();
@@ -86,8 +132,5 @@ macro_rules! add_ufunc_nin2_nout1 {
 
 pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_class::<Ufunc>()?;
-    add_ufunc_nin1_nout1!(m, "sin");
-    add_ufunc_nin1_nout1!(m, "cos");
-    add_ufunc_nin2_nout1!(m, "multiply");
     Ok(())
 }

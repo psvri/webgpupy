@@ -8,3 +8,4 @@ Webgpupy implementation of ray tracing in one weekend
     :maxdepth: 2
 
     chapter_2_wgpy
+    chapter_4_wgpy

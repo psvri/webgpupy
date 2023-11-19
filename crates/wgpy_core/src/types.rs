@@ -116,3 +116,78 @@ pub enum UfuncType {
     UfuncNin1Nout1Type([OperandType; 1], OperandType),
     UfuncNin2Nout1Type([OperandType; 2], OperandType),
 }
+
+#[derive(Debug)]
+pub struct IndexSlice {
+    start: i64,
+    stop: i64,
+    step: i64,
+}
+
+impl IndexSlice {
+    pub fn iterate(&self) -> IndexSliceIter {
+        IndexSliceIter::new(self)
+    }
+
+    pub fn new(mut start: i64, mut stop: i64, step: i64, length: i64) -> Result<Self, String> {
+        if start > length || stop > length {
+            return Err("Index greater than length".to_string());
+        }
+        if start < 0 {
+            start = start + length;
+        }
+        if stop < 0 {
+            stop = stop + length;
+        }
+        Ok(Self { start, stop, step })
+    }
+}
+
+#[derive(Debug)]
+pub struct IndexSliceIter<'a> {
+    index_slice: &'a IndexSlice,
+    current_pos: i64,
+}
+
+impl<'a> IndexSliceIter<'a> {
+    pub fn new(index_slice: &'a IndexSlice) -> Self {
+        Self {
+            index_slice,
+            current_pos: index_slice.start,
+        }
+    }
+}
+
+impl Iterator for IndexSliceIter<'_> {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current_pos != self.index_slice.stop {
+            let pos = self.current_pos;
+            self.current_pos += self.index_slice.step;
+            Some(pos as u32)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::IndexSlice;
+
+    #[test]
+    fn test_index_slice_iter() {
+        let index_slice = IndexSlice::new(0, 4, 1, 10).unwrap();
+        assert_eq!([0, 1, 2, 3].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+
+        let index_slice = IndexSlice::new(0, 4, 2, 10).unwrap();
+        assert_eq!([0, 2].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+    }
+
+    #[test]
+    fn test_index_slice_iter_rev() {
+        let index_slice = IndexSlice::new(-3, -1, 1, 10).unwrap();
+        assert_eq!([7, 8].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+    }
+}

@@ -80,7 +80,7 @@ fn shape_to_indexes(to_shape: &[u32], from_shape: &[u32]) -> Vec<u32> {
 pub async fn broadcast_to(x: &NdArray, shape: &[u32]) -> NdArray {
     let braodcasted_shape = broadcast_shape(&x.shape, shape).unwrap();
 
-    let indexes = UInt32ArrayGPU::from_vec(
+    let indexes = UInt32ArrayGPU::from_slice(
         &shape_to_indexes(&braodcasted_shape, &x.shape),
         x.data.get_gpu_device(),
     );

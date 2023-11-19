@@ -1,55 +1,24 @@
-use std::borrow::Cow;
-
 use pollster::FutureExt;
 use pyo3::{pyfunction, Python};
+use std::borrow::Cow;
 
 use crate::{
-    convert_pyobj_into_operand,
+    add_ufunc_nin1_nout1, convert_pyobj_into_operand, impl_ufunc_nin1_nout1,
     ndarraypy::*,
     types::{into_optional_dtypepy, DtypePy},
+    ufunc::Ufunc,
 };
 use pyo3::prelude::*;
 
-/// Performs cos of ndarray
-#[pyfunction]
-#[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
-pub fn _cos(
-    py: Python<'_>,
-    x: &PyAny,
-    r#where: Option<&NdArrayPy>,
-    #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
-) -> NdArrayPy {
-    let data = convert_pyobj_into_operand(x).unwrap();
-    let where_ = r#where.map(|x| x.into());
-    let dtype = dtype.map(|x| x.as_ref().dtype);
-    py.allow_threads(|| {
-        webgpupy::cos(data.as_ref(), where_, dtype)
-            .block_on()
-            .into()
-    })
-}
 
-/// Performs sin of ndarray
-#[pyfunction]
-#[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
-pub fn _sin(
-    py: Python<'_>,
-    x: &PyAny,
-    r#where: Option<&NdArrayPy>,
-    #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
-) -> NdArrayPy {
-    let data = convert_pyobj_into_operand(x).unwrap();
-    let where_ = r#where.map(|x| x.into());
-    let dtype = dtype.map(|x| x.as_ref().dtype);
-    py.allow_threads(|| {
-        webgpupy::sin(data.as_ref(), where_, dtype)
-            .block_on()
-            .into()
-    })
-}
+impl_ufunc_nin1_nout1!(_cos, webgpupy::cos);
+impl_ufunc_nin1_nout1!(_sin, webgpupy::sin);
+
 
 pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_sin, m)?)?;
     m.add_function(wrap_pyfunction!(_cos, m)?)?;
+    add_ufunc_nin1_nout1!(m, "sin");
+    add_ufunc_nin1_nout1!(m, "cos");
     Ok(())
 }

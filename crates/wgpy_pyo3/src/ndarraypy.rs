@@ -5,7 +5,7 @@ use pyo3::{exceptions::PyRuntimeError, prelude::*, types::*};
 use webgpupy::{full, *};
 
 use crate::{
-    arithmetic::_multiply,
+    arithmetic::*,
     cast::PyObectToRustPrimitive,
     convert_pyobj_into_array_u32, convert_pyobj_into_operand, convert_pyobj_into_scalar,
     convert_pyobj_into_vec_ndarray,
@@ -38,19 +38,9 @@ impl NdArrayPy {
     }
 
     #[doc = include_str!("../python/webgpupy/python_doc/ndarray.tolist.rst")]
-    pub fn tolist(&self, py: Python<'_>) -> Py<PyAny> {
+    pub fn tolist(&self, py: Python<'_>) -> PyResult<Py<PyList>> {
         let values = self.ndarray.data.get_raw_values().block_on();
-
-        match values {
-            ScalarArray::U32Vec(x) => x.into_py(py),
-            ScalarArray::F32Vec(x) => x.into_py(py),
-            ScalarArray::U16Vec(x) => x.into_py(py),
-            ScalarArray::U8Vec(x) => x.into_py(py),
-            ScalarArray::I32Vec(x) => x.into_py(py),
-            ScalarArray::I16Vec(x) => x.into_py(py),
-            ScalarArray::I8Vec(x) => x.into_py(py),
-            ScalarArray::BOOLVec(x) => x.into_py(py),
-        }
+        to_list(py, &values, 0, &self.ndarray.shape, &mut 0)
     }
 
     pub fn reshape(&self, py: Python<'_>, shape: Vec<u32>) -> Py<PyAny> {
@@ -70,6 +60,30 @@ impl NdArrayPy {
         Ok(_multiply(py, slf.as_ref(), other, None, None))
     }
 
+    pub fn __rmul__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_multiply(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __truediv__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_divide(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __add__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_add(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __radd__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_add(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __sub__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_subtract(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __rsub__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_subtract(py, other, slf.as_ref(), None, None))
+    }
+
     pub fn astype(&self, #[pyo3(from_py_with = "into_dtypepy")] dtype: Dtype) -> PyResult<Self> {
         Ok(Self {
             ndarray: self.ndarray.astype(dtype).block_on(),
@@ -82,6 +96,21 @@ impl NdArrayPy {
             new_array.shape = vec![(new_array.shape).iter().copied().product()];
             Ok(NdArrayPy { ndarray: new_array })
         })
+    }
+
+    pub fn __getitem__(&self, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        let index_slices = subscripts_to_index_slices(other, &self.ndarray.shape)?;
+        let mut indexes = vec![];
+        slice_to_index(&self.ndarray.shape, 0, &index_slices, &mut indexes, 0);
+        let indexes = NdArray::from_slice(
+            indexes.as_slice().into(),
+            vec![indexes.len() as u32],
+            Some(self.ndarray.data.get_gpu_device()),
+        )
+        .block_on();
+        let ndarray = py.allow_threads(|| self.ndarray.take(&indexes, None).block_on());
+
+        Ok(NdArrayPy { ndarray })
     }
 }
 
@@ -138,6 +167,126 @@ pub fn array_full(
                 .into(),
         )
     })
+}
+
+fn to_list(
+    py: Python<'_>,
+    values: &ScalarArray,
+    depth: u32,
+    shape: &[u32],
+    pos: &mut usize,
+) -> PyResult<Py<PyList>> {
+    if depth as usize == shape.len() - 1 {
+        let len = shape[shape.len() - 1] as usize;
+        let list = match values {
+            ScalarArray::F32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::U32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::U16Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::U8Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::I32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::I16Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::I8Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::BOOLVec(x) => PyList::new(py, &x[*pos..*pos + len]),
+        };
+        *pos += len;
+        PyResult::Ok(list.into_py(py))
+    } else {
+        let list = PyList::empty(py);
+        for _ in 0..shape[depth as usize] {
+            list.append(to_list(py, values, depth + 1, shape, pos)?)?;
+        }
+        PyResult::Ok(list.into_py(py))
+    }
+}
+
+fn slice_to_index(
+    shape: &[u32],
+    depth: u32,
+    subscripts: &[IndexSlice],
+    indexes: &mut Vec<u32>,
+    base_index: u32,
+) {
+    if depth as usize == shape.len() - 1 {
+        let slice = &subscripts[depth as usize];
+        for i in slice.iterate() {
+            indexes.push(base_index + i);
+        }
+    } else {
+        let slice = &subscripts[depth as usize];
+        let count = shape[(depth + 1) as usize..].iter().product::<u32>();
+        for i in slice.iterate() {
+            slice_to_index(
+                shape,
+                depth + 1,
+                subscripts,
+                indexes,
+                base_index + (i * count),
+            );
+        }
+    }
+}
+
+fn slice_to_index_slice(subscripts: &PyAny, length: i32) -> PyResult<IndexSlice> {
+    let slice = subscripts.downcast::<PySlice>()?;
+    let indices = slice.indices(length)?;
+    Ok(IndexSlice::new(
+        indices.start as i64,
+        indices.stop as i64,
+        indices.step as i64,
+        length as i64,
+    )
+    .unwrap())
+}
+
+fn subscripts_to_index_slices(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec<IndexSlice>> {
+    if subscripts.is_instance_of::<PyTuple>() {
+        let subscripts_tuple = subscripts.downcast::<PyTuple>()?;
+        let length = subscripts_tuple.len();
+        let mut index_slices = Vec::with_capacity(shape.len());
+
+        for i in 0..length {
+            let slice = subscripts_tuple.get_item(i)?;
+            if slice.is_instance_of::<PySlice>() {
+                index_slices.push(slice_to_index_slice(slice, shape[i] as i32)?);
+            } else if slice.is_instance_of::<PyInt>() {
+                let index = slice.extract().unwrap();
+                index_slices.push(IndexSlice::new(index, index + 1, 1, shape[i] as i64).unwrap());
+            } else {
+                return Err(PyRuntimeError::new_err(format!(
+                    "Operation not supported for the given subscripts {:?}",
+                    subscripts.get_type(),
+                )));
+            }
+        }
+
+        for i in length..shape.len() {
+            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
+        }
+
+        Ok(index_slices)
+    } else if subscripts.is_instance_of::<PyInt>() {
+        let index = subscripts.extract().unwrap();
+        let mut index_slices = Vec::with_capacity(shape.len());
+        index_slices.push(IndexSlice::new(index, index + 1, 1, shape[0] as i64).unwrap());
+        for i in 1..shape.len() {
+            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
+        }
+
+        Ok(index_slices)
+    } else if subscripts.is_instance_of::<PySlice>() {
+        let mut index_slices = Vec::with_capacity(shape.len());
+        index_slices.push(slice_to_index_slice(subscripts, shape[0] as i32)?);
+
+        for i in 1..shape.len() {
+            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
+        }
+        Ok(index_slices)
+    } else {
+        Err(PyRuntimeError::new_err(format!(
+            "Operation not supported for the given subscripts {:?}",
+            subscripts.get_type(),
+        )))
+    }
 }
 
 pub fn get_shape(data: &PyAny) -> PyResult<Vec<u32>> {

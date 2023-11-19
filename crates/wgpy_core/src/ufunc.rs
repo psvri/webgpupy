@@ -86,3 +86,28 @@ where
         dtype,
     }
 }
+
+// TODO: Probably wont be required after https://github.com/rust-lang/rust/pull/115822
+#[macro_export]
+macro_rules! ufunc_nin2_nout1_body {
+    ($name: ident, $dyn: ident) => {
+        pub async fn $name(
+            input1: &NdArray,
+            input2: &NdArray,
+            where_: Option<&NdArray>,
+            dtype: Option<Dtype>,
+        ) -> NdArray {
+            ufunc_nin2_nout1(|x, y| Box::pin($dyn(x, y)), input1, input2, where_, dtype).await
+        }
+    };
+}
+
+// TODO: Probably wont be required after https://github.com/rust-lang/rust/pull/115822
+#[macro_export]
+macro_rules! ufunc_nin1_nout1_body {
+    ($name: ident, $dyn: ident) => {
+        pub async fn $name(ndarray: &NdArray, where_: Option<&NdArray>, dtype: Option<Dtype>) -> NdArray {
+            ufunc_nin1_nout1($dyn, ndarray, where_, dtype).await
+        }
+    };
+}

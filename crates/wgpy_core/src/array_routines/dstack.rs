@@ -72,8 +72,8 @@ pub async fn dstack(tup: &[&NdArray]) -> NdArray {
             let dst_indexes = (0..count)
                 .map(|x| last_dimension + (x * last_dimension_size))
                 .collect::<Vec<u32>>();
-            let src_indexes_gpu = UInt32ArrayGPU::from_vec(&src_indexes, device.clone());
-            let dst_indexes_gpu = UInt32ArrayGPU::from_vec(&dst_indexes, device.clone());
+            let src_indexes_gpu = UInt32ArrayGPU::from_slice(&src_indexes, device.clone());
+            let dst_indexes_gpu = UInt32ArrayGPU::from_slice(&dst_indexes, device.clone());
             put_dyn(
                 &array.data,
                 &src_indexes_gpu,

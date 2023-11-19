@@ -1,13 +1,10 @@
 use arrow_gpu::kernels::*;
-use webgpupy_core::{ufunc_nin1_nout1, Dtype, NdArray, OperandType, UfuncType};
+use webgpupy_core::{
+    ufunc_nin1_nout1, ufunc_nin1_nout1_body, Dtype, NdArray, OperandType, UfuncType,
+};
 
-pub async fn sin(ndarray: &NdArray, where_: Option<&NdArray>, dtype: Option<Dtype>) -> NdArray {
-    ufunc_nin1_nout1(sin_dyn, ndarray, where_, dtype).await
-}
-
-pub async fn cos(ndarray: &NdArray, where_: Option<&NdArray>, dtype: Option<Dtype>) -> NdArray {
-    ufunc_nin1_nout1(cos_dyn, ndarray, where_, dtype).await
-}
+ufunc_nin1_nout1_body!(sin, sin_dyn);
+ufunc_nin1_nout1_body!(cos, cos_dyn);
 
 pub const COS_TYPES: [UfuncType; 5] = [
     UfuncType::UfuncNin1Nout1Type(

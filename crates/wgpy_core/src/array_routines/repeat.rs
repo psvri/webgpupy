@@ -76,7 +76,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
                     indexes.push(i);
                 }
             }
-            let indexes = UInt32ArrayGPU::from_vec(&indexes, arr.data.get_gpu_device());
+            let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = vec![final_length];
             let data = take_dyn(&arr.data, &indexes).await;
@@ -97,7 +97,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
                     indexes.push(idx as u32)
                 }
             });
-            let indexes = UInt32ArrayGPU::from_vec(&indexes, arr.data.get_gpu_device());
+            let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = vec![final_length];
             let data = take_dyn(&arr.data, &indexes).await;
@@ -112,7 +112,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
         (_, Some(y)) => {
             let mut indexes = vec![];
             generate_repeat_indexes(&arr.shape, repeats, y, &mut 0, 0, &mut indexes);
-            let indexes = UInt32ArrayGPU::from_vec(&indexes, arr.data.get_gpu_device());
+            let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = generate_repeat_shape(&arr.shape, repeats, y);
             let data = take_dyn(&arr.data, &indexes).await;
