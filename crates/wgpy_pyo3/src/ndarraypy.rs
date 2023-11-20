@@ -9,7 +9,8 @@ use crate::{
     cast::PyObectToRustPrimitive,
     convert_pyobj_into_array_u32, convert_pyobj_into_operand, convert_pyobj_into_scalar,
     convert_pyobj_into_vec_ndarray,
-    types::{into_dtypepy, into_optional_dtypepy, DtypePy},
+    logical::{_greater, _lesser},
+    types::{into_dtypepy, into_optional_dtypepy, DtypePy}, binary::{_bitwise_and, _bitwise_or},
 };
 
 /// N-dimentional array
@@ -82,6 +83,22 @@ impl NdArrayPy {
 
     pub fn __rsub__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
         Ok(_subtract(py, other, slf.as_ref(), None, None))
+    }
+
+    pub fn __lt__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_lesser(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __gt__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_greater(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __and__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_bitwise_and(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __or__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_bitwise_or(py, slf.as_ref(), other, None, None))
     }
 
     pub fn astype(&self, #[pyo3(from_py_with = "into_dtypepy")] dtype: Dtype) -> PyResult<Self> {

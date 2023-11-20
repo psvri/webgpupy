@@ -61,14 +61,30 @@ where
     ) -> Pin<Box<dyn Future<Output = ArrowArrayGPU> + Send + 'b>>,
 {
     let broadcasted_shape = broadcast_shape(&ndarray1.shape, &ndarray2.shape).unwrap();
-    let in1 = broadcast_to(ndarray1, &broadcasted_shape).await;
-    let in2 = broadcast_to(ndarray2, &broadcasted_shape).await;
+    let mut in1 = ndarray1;
+    let temp1;
+    if ndarray1.shape != broadcasted_shape {
+        temp1 = broadcast_to(ndarray1, &broadcasted_shape).await;
+        in1 = &temp1;
+    }
+    let mut in2 = ndarray2;
+    let temp2;
+    if ndarray2.shape != broadcasted_shape {
+        temp2 = broadcast_to(ndarray2, &broadcasted_shape).await;
+        in2 = &temp2;
+    }
 
     let mut new_gpu_array = dyn_function(&in1.data, &in2.data).await;
 
     if let Some(mask) = where_ {
         if let ArrowArrayGPU::BooleanArrayGPU(mask) = &mask.data {
-            new_gpu_array = merge_dyn(&new_gpu_array, &in2.data, mask).await;
+            let zero_array = broadcast_dyn(
+                ScalarValue::zero(&new_gpu_array.get_dtype().into()).into(),
+                new_gpu_array.len() as usize,
+                new_gpu_array.get_gpu_device(),
+            )
+            .await;
+            new_gpu_array = merge_dyn(&new_gpu_array, &zero_array, mask).await;
         }
     }
 
@@ -106,7 +122,11 @@ macro_rules! ufunc_nin2_nout1_body {
 #[macro_export]
 macro_rules! ufunc_nin1_nout1_body {
     ($name: ident, $dyn: ident) => {
-        pub async fn $name(ndarray: &NdArray, where_: Option<&NdArray>, dtype: Option<Dtype>) -> NdArray {
+        pub async fn $name(
+            ndarray: &NdArray,
+            where_: Option<&NdArray>,
+            dtype: Option<Dtype>,
+        ) -> NdArray {
             ufunc_nin1_nout1($dyn, ndarray, where_, dtype).await
         }
     };

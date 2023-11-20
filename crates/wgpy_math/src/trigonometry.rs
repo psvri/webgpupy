@@ -40,8 +40,6 @@ mod test {
 
     test_ufunc_nin1_nout1_f32!(
         test_sin_f32_mask_mixed,
-        Dtype::Float32,
-        Dtype::Float32,
         [1.0, 1.0],
         [1.0f32.sin(), 0.0],
         [true, false],
@@ -50,8 +48,6 @@ mod test {
 
     test_ufunc_nin1_nout1_f32!(
         test_sin_f32_mask_true,
-        Dtype::Float32,
-        Dtype::Float32,
         [1.0, 2.0],
         [1.0f32.sin(), 2.0f32.sin()],
         [true, true],

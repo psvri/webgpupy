@@ -1,5 +1,5 @@
 [package]
-name = "webgpupy"
+name = "webgpupy_logical"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,9 @@ edition = "2021"
 
 [dependencies]
 webgpupy_core = {path="../wgpy_core"}
-webgpupy_math = {path="../wgpy_math"}
-webgpupy_logical = {path="../wgpy_logical"}
+arrow_gpu = {workspace=true}
+futures = {workspace = true}
+
+[dev-dependencies]
+tokio = { workspace = true }
+test_utils = {path = "../test_utils"}

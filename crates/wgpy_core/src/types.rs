@@ -24,7 +24,8 @@ impl From<ArrowType> for Dtype {
             ArrowType::Int32Type => Dtype::Int32,
             ArrowType::Int16Type => Dtype::Int16,
             ArrowType::Int8Type => Dtype::Int8,
-            _ => panic!("Unsupported type"),
+            ArrowType::BooleanType => Dtype::Bool,
+            _ => panic!("Unsupported dtype"),
         }
     }
 }
@@ -39,6 +40,7 @@ impl From<&ArrowType> for Dtype {
             ArrowType::Int32Type => Dtype::Int32,
             ArrowType::Int16Type => Dtype::Int16,
             ArrowType::Int8Type => Dtype::Int8,
+            ArrowType::BooleanType => Dtype::Bool,
             _ => panic!("Unsupported type"),
         }
     }

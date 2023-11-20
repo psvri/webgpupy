@@ -46,7 +46,7 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 [[package]]
 name = "arrow_gpu"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_arithmetic",
  "arrow_gpu_array",
@@ -61,7 +61,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_arithmetic"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -70,7 +70,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_array"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "async-trait",
  "bytemuck",
@@ -85,7 +85,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_cast"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -95,7 +95,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_compare"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -105,7 +105,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_logical"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -115,7 +115,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_math"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -125,7 +125,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_routines"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -135,7 +135,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_trigonometry"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=82caa99a3ad792085e90c3084defef418ce3df21#82caa99a3ad792085e90c3084defef418ce3df21"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=cfab53982263711429029c093cc8da73f6c2884b#cfab53982263711429029c093cc8da73f6c2884b"
 dependencies = [
  "arrow_gpu_array",
  "async-trait",
@@ -1233,6 +1233,7 @@ name = "webgpupy"
 version = "0.1.0"
 dependencies = [
  "webgpupy_core",
+ "webgpupy_logical",
  "webgpupy_math",
 ]
 
@@ -1246,6 +1247,17 @@ dependencies = [
  "pollster",
  "tokio",
  "wgpu",
+]
+
+[[package]]
+name = "webgpupy_logical"
+version = "0.1.0"
+dependencies = [
+ "arrow_gpu",
+ "futures",
+ "test_utils",
+ "tokio",
+ "webgpupy_core",
 ]
 
 [[package]]

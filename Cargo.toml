@@ -14,7 +14,7 @@ edition = "2021"
 [workspace.dependencies]
 pyo3 = { version = "0.20.0", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
-arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "82caa99a3ad792085e90c3084defef418ce3df21"}
+arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "cfab53982263711429029c093cc8da73f6c2884b"}
 pollster = "0.3.0"
 futures = "0.3.29"
 wgpu = "0.18.0"
