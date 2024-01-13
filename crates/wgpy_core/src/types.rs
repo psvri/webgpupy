@@ -143,6 +143,10 @@ impl IndexSlice {
         }
         Ok(Self { start, stop, step })
     }
+
+    pub fn element_count(&self) -> i64 {
+        ((self.start - self.stop) / self.stop).abs()
+    }
 }
 
 #[derive(Debug)]
@@ -181,15 +185,24 @@ mod tests {
     #[test]
     fn test_index_slice_iter() {
         let index_slice = IndexSlice::new(0, 4, 1, 10).unwrap();
-        assert_eq!([0, 1, 2, 3].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+        assert_eq!(
+            [0, 1, 2, 3].as_ref(),
+            &index_slice.iterate().collect::<Vec<u32>>()
+        );
 
         let index_slice = IndexSlice::new(0, 4, 2, 10).unwrap();
-        assert_eq!([0, 2].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+        assert_eq!(
+            [0, 2].as_ref(),
+            &index_slice.iterate().collect::<Vec<u32>>()
+        );
     }
 
     #[test]
     fn test_index_slice_iter_rev() {
         let index_slice = IndexSlice::new(-3, -1, 1, 10).unwrap();
-        assert_eq!([7, 8].as_ref(), &index_slice.iterate().collect::<Vec<u32>>());
+        assert_eq!(
+            [7, 8].as_ref(),
+            &index_slice.iterate().collect::<Vec<u32>>()
+        );
     }
 }

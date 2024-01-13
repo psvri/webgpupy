@@ -5,7 +5,7 @@ use arrow_gpu::{
         broadcast_dyn, ArrowArrayGPU, BooleanArrayGPU, Float32ArrayGPU, GpuDevice, Int16ArrayGPU,
         Int32ArrayGPU, Int8ArrayGPU, UInt16ArrayGPU, UInt32ArrayGPU, UInt8ArrayGPU,
     },
-    kernels::{cast_dyn, take_dyn},
+    kernels::{cast_dyn, neg_dyn, take_dyn},
 };
 
 use crate::{Dtype, Operand, ScalarArrayRef, ScalarValue, GPU_DEVICE};
@@ -115,6 +115,17 @@ impl NdArray {
             } else {
                 unreachable!()
             }
+        }
+    }
+
+    pub async fn neg(&self) -> Self {
+        let data = neg_dyn(&self.data).await;
+        let dtype = data.get_dtype().into();
+        Self {
+            shape: self.shape.clone(),
+            dims: self.dims,
+            data,
+            dtype,
         }
     }
 

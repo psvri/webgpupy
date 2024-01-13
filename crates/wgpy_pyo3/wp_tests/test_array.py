@@ -22,3 +22,6 @@ def test_indexing(wp_array):
     assert wp_array[:].tolist() == [1.0, 2.0, 3.0, 4.0]
     assert wp_array[1].tolist() == [2.0]
     assert wp_array[:,0].tolist() == [1.0, 2.0, 3.0, 4.0]
+
+def test_neg(wp_array):
+    assert (-wp_array).tolist() == [[-1.0], [-2.0], [-3.0], [-4.0]]

@@ -13,3 +13,4 @@ name = "webgpupy"
 pyo3 = {workspace=true}
 pollster = {workspace=true}
 webgpupy = {path="../wgpy"}
+pyo3-log = "0.9.0"

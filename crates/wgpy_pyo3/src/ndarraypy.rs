@@ -6,11 +6,12 @@ use webgpupy::{full, *};
 
 use crate::{
     arithmetic::*,
+    binary::{_bitwise_and, _bitwise_or, _invert},
     cast::PyObectToRustPrimitive,
     convert_pyobj_into_array_u32, convert_pyobj_into_operand, convert_pyobj_into_scalar,
     convert_pyobj_into_vec_ndarray,
-    logical::{_greater, _lesser},
-    types::{into_dtypepy, into_optional_dtypepy, DtypePy}, binary::{_bitwise_and, _bitwise_or},
+    logical::{_equal, _greater, _lesser},
+    types::{into_dtypepy, into_optional_dtypepy, DtypePy},
 };
 
 /// N-dimentional array
@@ -101,6 +102,21 @@ impl NdArrayPy {
         Ok(_bitwise_or(py, slf.as_ref(), other, None, None))
     }
 
+    pub fn __neg__(&self) -> PyResult<Self> {
+        Ok(NdArrayPy {
+            ndarray: self.ndarray.neg().block_on(),
+        })
+    }
+
+    pub fn __eq__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_equal(py, slf.as_ref(), other, None, None))
+    }
+
+    pub fn __ne__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        let eq = _equal(py, slf.as_ref(), other, None, None).into_py(py);
+        Ok(_invert(py, eq.into_ref(py), None, None))
+    }
+
     pub fn astype(&self, #[pyo3(from_py_with = "into_dtypepy")] dtype: Dtype) -> PyResult<Self> {
         Ok(Self {
             ndarray: self.ndarray.astype(dtype).block_on(),
@@ -117,7 +133,11 @@ impl NdArrayPy {
 
     pub fn __getitem__(&self, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
         let index_slices = subscripts_to_index_slices(other, &self.ndarray.shape)?;
-        let mut indexes = vec![];
+        let capacity = index_slices
+            .iter()
+            .map(|x| x.element_count() as usize)
+            .product();
+        let mut indexes = Vec::with_capacity(capacity);
         slice_to_index(&self.ndarray.shape, 0, &index_slices, &mut indexes, 0);
         let indexes = NdArray::from_slice(
             indexes.as_slice().into(),
@@ -225,9 +245,7 @@ fn slice_to_index(
 ) {
     if depth as usize == shape.len() - 1 {
         let slice = &subscripts[depth as usize];
-        for i in slice.iterate() {
-            indexes.push(base_index + i);
-        }
+        indexes.extend(slice.iterate().map(|x| base_index + x));
     } else {
         let slice = &subscripts[depth as usize];
         let count = shape[(depth + 1) as usize..].iter().product::<u32>();

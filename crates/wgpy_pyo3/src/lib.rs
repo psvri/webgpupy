@@ -1,7 +1,9 @@
 pub mod arithmetic;
 pub mod binary;
 pub(crate) mod cast;
+pub mod gpu_device;
 pub mod logical;
+pub mod misc;
 pub mod misc_math;
 pub mod ndarraypy;
 pub mod trigonometry;
@@ -87,10 +89,12 @@ pub(crate) fn convert_pyobj_into_vec_ndarray(data: &PyAny) -> PyResult<Vec<&NdAr
 #[pymodule]
 #[pyo3(name = "webgpupy")]
 fn webgpupy_module(_py: Python, m: &PyModule) -> PyResult<()> {
+    pyo3_log::init();
     ufunc::create_py_items(m)?;
     logical::create_py_items(m)?;
     binary::create_py_items(m)?;
     trigonometry::create_py_items(m)?;
+    misc::create_py_items(m)?;
     misc_math::create_py_items(m)?;
     arithmetic::create_py_items(m)?;
     ndarraypy::create_py_items(m)?;

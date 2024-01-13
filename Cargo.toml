@@ -3,9 +3,9 @@ resolver = "2"
 members = [
     "crates/wgpy",
     "crates/wgpy_core",
-    "crates/wgpy_pyo3",
     "crates/wgpy_math",
-    "crates/test_utils"
+    "crates/test_utils",
+    "crates/wgpy_pyo3",
 ]
 
 [workspace.package]
@@ -14,12 +14,14 @@ edition = "2021"
 [workspace.dependencies]
 pyo3 = { version = "0.20.0", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
-arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "cfab53982263711429029c093cc8da73f6c2884b"}
+arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "e22207f5ef152092a0b4160911d4bde4d79ca847"}
 pollster = "0.3.0"
 futures = "0.3.29"
 wgpu = "0.18.0"
 once_cell = "1.18.0"
 tokio = { version = "1.34.0", features = ["macros", "rt-multi-thread"] }
+bytemuck = "1.14.0"
+async-trait = "0.1.74"
 
 [profile.release]
 debug=1
