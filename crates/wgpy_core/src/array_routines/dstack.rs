@@ -36,26 +36,10 @@ fn validate_and_genereate_new_shapes(tup: &[&NdArray]) -> Vec<Vec<u32>> {
 }
 
 // TODO broadcasting of shapes and validating
-pub async fn dstack(tup: &[&NdArray]) -> NdArray {
+pub fn dstack(tup: &[&NdArray]) -> NdArray {
     if tup.len() == 1 {
-        tup[1].clone_array().await
+        tup[1].clone_array()
     } else {
-        // for i in 1..tup.len() {
-        //     if tup[0].shape != tup[i].shape {
-        //         panic!(
-        //             "Cant dstack shapes {:?} and {:?}",
-        //             tup[0].shape, tup[i].shape
-        //         )
-        //     }
-        //     if tup[0].dtype != tup[i].dtype {
-        //         panic!(
-        //             "Cant dstack dtypes {:?} and {:?}",
-        //             tup[0].dtype, tup[i].dtype
-        //         )
-        //     }
-        // }
-
-        //let new_array_count: u32 = tup.iter().map(|x| x.shape.iter().product::<u32>()).sum();
         let new_shapes = validate_and_genereate_new_shapes(tup);
         let mut new_shape = new_shapes[0].clone();
         let shape_len = new_shape.len();
@@ -63,7 +47,7 @@ pub async fn dstack(tup: &[&NdArray]) -> NdArray {
         let last_dimension_size = new_shapes.iter().map(|x| x[x.len() - 1]).sum();
         new_shape[shape_len - 1] = last_dimension_size;
         let device = tup[0].data.get_gpu_device().clone();
-        let mut new_array = zeros(new_shape, Some(tup[0].dtype), Some(device.clone())).await;
+        let mut new_array = zeros(new_shape, Some(tup[0].dtype), Some(device.clone()));
 
         let mut last_dimension = 0;
         for array in tup {
@@ -79,8 +63,7 @@ pub async fn dstack(tup: &[&NdArray]) -> NdArray {
                 &src_indexes_gpu,
                 &mut new_array.data,
                 &dst_indexes_gpu,
-            )
-            .await;
+            );
             last_dimension += array.shape[array.shape.len() - 1];
         }
 
@@ -92,34 +75,33 @@ pub async fn dstack(tup: &[&NdArray]) -> NdArray {
 mod tests {
     use crate::{dstack, NdArray};
 
-    #[tokio::test]
-    async fn test_dstack_2() {
+    #[test]
+    fn test_dstack_2() {
         let input_1 =
-            NdArray::from_slice([1.0f32, 2.0, 3.0, 4.0].as_ref().into(), vec![2, 2, 1], None).await;
+            NdArray::from_slice([1.0f32, 2.0, 3.0, 4.0].as_ref().into(), vec![2, 2, 1], None);
         let input_2 =
-            NdArray::from_slice([5.0f32, 6.0, 7.0, 8.0].as_ref().into(), vec![2, 2, 1], None).await;
-        let new_gpu_array = dstack(&[&input_1, &input_2]).await;
+            NdArray::from_slice([5.0f32, 6.0, 7.0, 8.0].as_ref().into(), vec![2, 2, 1], None);
+        let new_gpu_array = dstack(&[&input_1, &input_2]);
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 5.0, 2.0, 6.0, 3.0, 7.0, 4.0, 8.0].into()
         );
     }
 
-    #[tokio::test]
-    async fn test_dstack_3() {
+    #[test]
+    fn test_dstack_3() {
         let input_1 =
-            NdArray::from_slice([1.0f32, 2.0, 3.0, 4.0].as_ref().into(), vec![2, 2, 1], None).await;
+            NdArray::from_slice([1.0f32, 2.0, 3.0, 4.0].as_ref().into(), vec![2, 2, 1], None);
         let input_2 =
-            NdArray::from_slice([5.0f32, 6.0, 7.0, 8.0].as_ref().into(), vec![2, 2, 1], None).await;
+            NdArray::from_slice([5.0f32, 6.0, 7.0, 8.0].as_ref().into(), vec![2, 2, 1], None);
         let input_3 = NdArray::from_slice(
             [9.0f32, 10.0, 11.0, 12.0].as_ref().into(),
             vec![2, 2, 1],
             None,
-        )
-        .await;
-        let new_gpu_array = dstack(&[&input_1, &input_2, &input_3]).await;
+        );
+        let new_gpu_array = dstack(&[&input_1, &input_2, &input_3]);
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 5.0, 9.0, 2.0, 6.0, 10.0, 3.0, 7.0, 11.0, 4.0, 8.0, 12.0].into()
         );
     }

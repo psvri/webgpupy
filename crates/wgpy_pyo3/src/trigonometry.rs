@@ -1,4 +1,3 @@
-use pollster::FutureExt;
 use pyo3::{pyfunction, Python};
 use std::borrow::Cow;
 
@@ -10,10 +9,8 @@ use crate::{
 };
 use pyo3::prelude::*;
 
-
 impl_ufunc_nin1_nout1!(_cos, webgpupy::cos);
 impl_ufunc_nin1_nout1!(_sin, webgpupy::sin);
-
 
 pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_sin, m)?)?;

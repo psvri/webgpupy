@@ -8,8 +8,6 @@ edition = "2021"
 [dependencies]
 webgpupy_core = {path="../wgpy_core"}
 arrow_gpu = {workspace=true}
-futures = {workspace = true}
 
 [dev-dependencies]
-tokio = { workspace = true }
 test_utils = {path = "../test_utils"}

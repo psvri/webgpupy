@@ -5,7 +5,6 @@ use crate::{
     types::{into_optional_dtypepy, DtypePy},
     ufunc::Ufunc,
 };
-use pollster::FutureExt;
 use pyo3::prelude::*;
 use pyo3::{pyfunction, Python};
 use std::borrow::Cow;

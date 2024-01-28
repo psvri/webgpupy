@@ -62,11 +62,7 @@ macro_rules! impl_ufunc_nin2_nout1 {
             let y = convert_pyobj_into_operand(y).unwrap();
             let where_ = r#where.map(|x| x.into());
             let dtype = dtype.map(|x| x.as_ref().dtype);
-            py.allow_threads(|| {
-                $fn_name(x.as_ref(), y.as_ref(), where_, dtype)
-                    .block_on()
-                    .into()
-            })
+            py.allow_threads(|| $fn_name(x.as_ref(), y.as_ref(), where_, dtype).into())
         }
     };
 }
@@ -85,7 +81,7 @@ macro_rules! impl_ufunc_nin1_nout1 {
             let data = convert_pyobj_into_operand(x).unwrap();
             let where_ = r#where.map(|x| x.into());
             let dtype = dtype.map(|x| x.as_ref().dtype);
-            py.allow_threads(|| $fn_name(data.as_ref(), where_, dtype).block_on().into())
+            py.allow_threads(|| $fn_name(data.as_ref(), where_, dtype).into())
         }
     };
 }

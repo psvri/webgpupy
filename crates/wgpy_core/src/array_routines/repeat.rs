@@ -50,7 +50,7 @@ fn generate_repeat_indexes(
 }
 
 /// Broadcast an array to a new shape
-pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArrayResult<NdArray> {
+pub fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArrayResult<NdArray> {
     let array_count = arr.shape.iter().product();
     let dtype = arr.data.get_dtype().into();
     match (repeats.len() as u32, axis) {
@@ -79,7 +79,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
             let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = vec![final_length];
-            let data = take_dyn(&arr.data, &indexes).await;
+            let data = take_dyn(&arr.data, &indexes);
 
             Ok(NdArray {
                 shape,
@@ -100,7 +100,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
             let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = vec![final_length];
-            let data = take_dyn(&arr.data, &indexes).await;
+            let data = take_dyn(&arr.data, &indexes);
 
             Ok(NdArray {
                 shape,
@@ -115,7 +115,7 @@ pub async fn repeat(arr: &NdArray, repeats: &[u32], axis: Option<u32>) -> NdArra
             let indexes = UInt32ArrayGPU::from_slice(&indexes, arr.data.get_gpu_device());
             let dims = 1u16;
             let shape = generate_repeat_shape(&arr.shape, repeats, y);
-            let data = take_dyn(&arr.data, &indexes).await;
+            let data = take_dyn(&arr.data, &indexes);
 
             Ok(NdArray {
                 shape,
@@ -132,22 +132,20 @@ mod test {
     use super::*;
     use crate::NdArray;
 
-    #[tokio::test]
-    async fn test_repeat() {
-        let input =
-            NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None).await;
-        let new_gpu_array = repeat(&input, &vec![2], None).await.unwrap();
+    #[test]
+    fn test_repeat() {
+        let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
+        let new_gpu_array = repeat(&input, &vec![2], None).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 2.0, 3.0, 3.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[6]);
 
-        let input =
-            NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None).await;
-        let new_gpu_array = repeat(&input, &vec![2, 1, 3], None).await.unwrap();
+        let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
+        let new_gpu_array = repeat(&input, &vec![2, 1, 3], None).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 3.0, 3.0, 3.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[6]);
@@ -172,31 +170,28 @@ mod test {
         assert_eq!(&result_indexes, &[0, 0, 1, 1, 1, 2]);
     }
 
-    #[tokio::test]
-    async fn test_repeat_with_axis() {
-        let input =
-            NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None).await;
-        let new_gpu_array = repeat(&input, &vec![2], Some(2)).await.unwrap();
+    #[test]
+    fn test_repeat_with_axis() {
+        let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
+        let new_gpu_array = repeat(&input, &vec![2], Some(2)).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 2.0, 3.0, 3.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[1, 1, 6]);
 
-        let input =
-            NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None).await;
-        let new_gpu_array = repeat(&input, &vec![1, 2, 3], Some(2)).await.unwrap();
+        let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
+        let new_gpu_array = repeat(&input, &vec![1, 2, 3], Some(2)).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 2.0, 3.0, 3.0, 3.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[1, 1, 6]);
 
-        let input =
-            NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None).await;
-        let new_gpu_array = repeat(&input, &vec![2], Some(1)).await.unwrap();
+        let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
+        let new_gpu_array = repeat(&input, &vec![2], Some(1)).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[1, 2, 3]);
@@ -205,11 +200,10 @@ mod test {
             [1.0f32, 2.0, 3.0, 4.0, 5.0, 6.0].as_ref().into(),
             vec![1, 2, 3],
             None,
-        )
-        .await;
-        let new_gpu_array = repeat(&input, &vec![2, 1], Some(1)).await.unwrap();
+        );
+        let new_gpu_array = repeat(&input, &vec![2, 1], Some(1)).unwrap();
         assert_eq!(
-            new_gpu_array.data.get_raw_values().await,
+            new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0].into()
         );
         assert_eq!(&new_gpu_array.shape, &[1, 3, 3]);
