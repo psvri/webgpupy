@@ -1,3 +1,5 @@
+use std::ops::{Range, RangeFrom, RangeTo};
+
 use arrow_gpu::array::ArrowType;
 
 use crate::ScalarValue;
@@ -119,11 +121,12 @@ pub enum UfuncType {
     UfuncNin2Nout1Type([OperandType; 2], OperandType),
 }
 
+// We are using i32 here to handle cases like [10:2:-1]
 #[derive(Debug)]
 pub struct IndexSlice {
-    start: i64,
-    stop: i64,
-    step: i64,
+    pub start: u32,
+    pub stop: u32,
+    pub step: i32,
 }
 
 impl IndexSlice {
@@ -131,28 +134,40 @@ impl IndexSlice {
         IndexSliceIter::new(self)
     }
 
-    pub fn new(mut start: i64, mut stop: i64, step: i64, length: i64) -> Result<Self, String> {
+    pub fn new(mut start: i64, mut stop: i64, step: i64, length: u32) -> Result<Self, String> {
+        let length = length as i64;
         if start > length || stop > length {
             return Err("Index greater than length".to_string());
         }
         if start < 0 {
-            start = start + length;
+            start += length;
         }
         if stop < 0 {
-            stop = stop + length;
+            stop += length;
         }
-        Ok(Self { start, stop, step })
+        Ok(Self {
+            start: start.try_into().unwrap(),
+            stop: stop.try_into().unwrap(),
+            step: step.try_into().unwrap(),
+        })
     }
 
-    pub fn element_count(&self) -> i64 {
-        ((self.start - self.stop) / self.stop).abs()
+    pub fn element_count(&self) -> u32 {
+        let step = (self.step).abs() as u32;
+        let diff = (self.start).abs_diff(self.stop);
+        let div_result = diff / step;
+        if diff % step == 0 {
+            div_result
+        } else {
+            div_result + 1
+        }
     }
 }
 
 #[derive(Debug)]
 pub struct IndexSliceIter<'a> {
     index_slice: &'a IndexSlice,
-    current_pos: i64,
+    current_pos: u32,
 }
 
 impl<'a> IndexSliceIter<'a> {
@@ -170,10 +185,90 @@ impl Iterator for IndexSliceIter<'_> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.current_pos != self.index_slice.stop {
             let pos = self.current_pos;
-            self.current_pos += self.index_slice.step;
-            Some(pos as u32)
+            if self.index_slice.step.is_negative() {
+                self.current_pos -= self.index_slice.step.abs() as u32;
+            } else {
+                self.current_pos += self.index_slice.step as u32;
+            }
+
+            Some(pos)
         } else {
             None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum IndexSliceOp {
+    Index(i64),
+    Range(Range<i64>),
+    RangeFrom(RangeFrom<i64>),
+    RangeTo(RangeTo<i64>),
+    RangeWithStep(Range<i64>, i32),
+    RangeFromWithStep(RangeFrom<i64>, i32),
+    RangeToWithStep(RangeTo<i64>, i32),
+}
+
+pub trait IntoIndexSliceOp {
+    fn into_slice_op(self) -> IndexSliceOp;
+}
+
+impl IntoIndexSliceOp for i64 {
+    fn into_slice_op(self) -> IndexSliceOp {
+        IndexSliceOp::Index(self)
+    }
+}
+
+impl IntoIndexSliceOp for Range<i64> {
+    fn into_slice_op(self) -> IndexSliceOp {
+        IndexSliceOp::Range(self)
+    }
+}
+
+impl IntoIndexSliceOp for RangeFrom<i64> {
+    fn into_slice_op(self) -> IndexSliceOp {
+        IndexSliceOp::RangeFrom(self)
+    }
+}
+
+impl From<i64> for IndexSliceOp {
+    fn from(value: i64) -> Self {
+        Self::Index(value)
+    }
+}
+
+impl From<Range<i64>> for IndexSliceOp {
+    fn from(value: Range<i64>) -> Self {
+        Self::Range(value)
+    }
+}
+
+impl From<RangeFrom<i64>> for IndexSliceOp {
+    fn from(value: RangeFrom<i64>) -> Self {
+        Self::RangeFrom(value)
+    }
+}
+
+impl From<(Range<i64>, i32)> for IndexSliceOp {
+    fn from(value: (Range<i64>, i32)) -> Self {
+        Self::RangeWithStep(value.0, value.1)
+    }
+}
+
+impl IndexSliceOp {
+    pub fn into_index_slice(&self, length: u32) -> IndexSlice {
+        match self {
+            IndexSliceOp::Index(x) => IndexSlice::new(*x, *x + 1, 1, length).unwrap(),
+            IndexSliceOp::Range(x) => IndexSlice::new(x.start, x.end, 1, length).unwrap(),
+            IndexSliceOp::RangeWithStep(x, step) => {
+                IndexSlice::new(x.start, x.end, (*step).into(), length).unwrap()
+            }
+            IndexSliceOp::RangeFrom(x) => {
+                IndexSlice::new(x.start, length.into(), 1, length).unwrap()
+            }
+            IndexSliceOp::RangeTo(_) => todo!(),
+            IndexSliceOp::RangeFromWithStep(_, _) => todo!(),
+            IndexSliceOp::RangeToWithStep(_, _) => todo!(),
         }
     }
 }

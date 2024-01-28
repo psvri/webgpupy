@@ -1,6 +1,5 @@
 use arrow_gpu::array::GpuDevice;
 use once_cell::sync::Lazy;
-use pollster::FutureExt;
 use std::sync::Arc;
 
 pub(crate) mod array_routines;
@@ -18,8 +17,4 @@ pub use operand::*;
 pub use types::*;
 pub use ufunc::*;
 
-pub static GPU_DEVICE: Lazy<Arc<GpuDevice>> = Lazy::new(|| Arc::new(GpuDevice::new().block_on()));
-
-// TODO once async fn in trait is stabalised
-// Impl std::ops asyn function
-// Impl index like python
+pub static GPU_DEVICE: Lazy<Arc<GpuDevice>> = Lazy::new(|| Arc::new(GpuDevice::new()));

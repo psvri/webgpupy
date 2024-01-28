@@ -1,7 +1,6 @@
 use crate::ufunc::Ufunc;
 use std::borrow::Cow;
 
-use pollster::FutureExt;
 use pyo3::{pyfunction, Python};
 
 use crate::{

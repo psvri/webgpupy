@@ -4,9 +4,9 @@ use webgpupy_core::{
     NdArray,
 };
 
-ufunc_nin2_nout1_body!(bitwise_and, bitwise_and_dyn);
-ufunc_nin2_nout1_body!(bitwise_or, bitwise_or_dyn);
-ufunc_nin1_nout1_body!(invert, bitwise_not_dyn);
+ufunc_nin2_nout1_body!(bitwise_and, bitwise_and_op_dyn);
+ufunc_nin2_nout1_body!(bitwise_or, bitwise_or_op_dyn);
+ufunc_nin1_nout1_body!(invert, bitwise_not_op_dyn);
 
 #[cfg(test)]
 mod test {

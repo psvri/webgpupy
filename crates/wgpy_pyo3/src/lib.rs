@@ -11,7 +11,6 @@ pub mod types;
 pub mod ufunc;
 
 use ndarraypy::NdArrayPy;
-use pollster::FutureExt;
 use pyo3::{exceptions::PyTypeError, prelude::*, types::*};
 use types::OperandPy;
 use webgpupy::{NdArray, ScalarValue};
@@ -22,11 +21,11 @@ pub(crate) fn convert_pyobj_into_operand(data: &PyAny) -> PyResult<OperandPy> {
         PyResult::Ok((&ndarray.get().ndarray).into())
     } else if data.is_instance_of::<PyFloat>() {
         let value = data.extract::<f32>()?;
-        let ndarray = NdArray::from_slice([value].as_slice().into(), vec![1], None).block_on();
+        let ndarray = NdArray::from_slice([value].as_slice().into(), vec![1], None);
         PyResult::Ok(ndarray.into())
     } else if data.is_instance_of::<PyInt>() {
         let value = data.extract::<i32>()?;
-        let ndarray = NdArray::from_slice([value].as_slice().into(), vec![1], None).block_on();
+        let ndarray = NdArray::from_slice([value].as_slice().into(), vec![1], None);
         PyResult::Ok(ndarray.into())
     } else {
         PyResult::Err(PyTypeError::new_err(

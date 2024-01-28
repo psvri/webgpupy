@@ -1,8 +1,7 @@
 use std::borrow::Cow;
 
-use pollster::FutureExt as _;
 use pyo3::{exceptions::PyRuntimeError, prelude::*, types::*};
-use webgpupy::{full, *};
+use webgpupy::*;
 
 use crate::{
     arithmetic::*,
@@ -41,12 +40,12 @@ impl NdArrayPy {
 
     #[doc = include_str!("../python/webgpupy/python_doc/ndarray.tolist.rst")]
     pub fn tolist(&self, py: Python<'_>) -> PyResult<Py<PyList>> {
-        let values = self.ndarray.data.get_raw_values().block_on();
+        let values = self.ndarray.data.get_raw_values();
         to_list(py, &values, 0, &self.ndarray.shape, &mut 0)
     }
 
     pub fn reshape(&self, py: Python<'_>, shape: Vec<u32>) -> Py<PyAny> {
-        let mut new_array = self.ndarray.clone_array().block_on();
+        let mut new_array = self.ndarray.clone_array();
         //TODO add validation
         new_array.shape = shape;
         NdArrayPy { ndarray: new_array }.into_py(py)
@@ -104,7 +103,7 @@ impl NdArrayPy {
 
     pub fn __neg__(&self) -> PyResult<Self> {
         Ok(NdArrayPy {
-            ndarray: self.ndarray.neg().block_on(),
+            ndarray: self.ndarray.neg(),
         })
     }
 
@@ -119,33 +118,21 @@ impl NdArrayPy {
 
     pub fn astype(&self, #[pyo3(from_py_with = "into_dtypepy")] dtype: Dtype) -> PyResult<Self> {
         Ok(Self {
-            ndarray: self.ndarray.astype(dtype).block_on(),
+            ndarray: self.ndarray.astype(dtype),
         })
     }
 
     pub fn flatten(&self, py: Python<'_>) -> PyResult<Self> {
         py.allow_threads(|| {
-            let mut new_array = self.ndarray.clone_array().block_on();
+            let mut new_array = self.ndarray.clone_array();
             new_array.shape = vec![(new_array.shape).iter().copied().product()];
             Ok(NdArrayPy { ndarray: new_array })
         })
     }
 
     pub fn __getitem__(&self, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        let index_slices = subscripts_to_index_slices(other, &self.ndarray.shape)?;
-        let capacity = index_slices
-            .iter()
-            .map(|x| x.element_count() as usize)
-            .product();
-        let mut indexes = Vec::with_capacity(capacity);
-        slice_to_index(&self.ndarray.shape, 0, &index_slices, &mut indexes, 0);
-        let indexes = NdArray::from_slice(
-            indexes.as_slice().into(),
-            vec![indexes.len() as u32],
-            Some(self.ndarray.data.get_gpu_device()),
-        )
-        .block_on();
-        let ndarray = py.allow_threads(|| self.ndarray.take(&indexes, None).block_on());
+        let index_slices = subscripts_to_index_slices_op(other, &self.ndarray.shape)?;
+        let ndarray = py.allow_threads(|| self.ndarray.get_items(&index_slices));
 
         Ok(NdArrayPy { ndarray })
     }
@@ -163,7 +150,7 @@ pub fn array_ones(
             Some(x) => &x.as_ref().dtype,
             None => &Dtype::Float32,
         };
-        ones(shape, Some(*array_type), None).block_on().into()
+        ones(shape, Some(*array_type), None).into()
     })
 }
 
@@ -179,7 +166,7 @@ pub fn array_zeros(
             Some(x) => &x.as_ref().dtype,
             None => &Dtype::Float32,
         };
-        zeros(shape, Some(*array_type), None).block_on().into()
+        zeros(shape, Some(*array_type), None).into()
     })
 }
 
@@ -198,11 +185,7 @@ pub fn array_full(
             None => &Dtype::Float32,
         };
         // TODO remove unwrap
-        PyResult::Ok(
-            full(shape, operand.into(), Some(*dtype), None)
-                .block_on()
-                .into(),
-        )
+        PyResult::Ok(full(shape, operand.into(), Some(*dtype), None).into())
     })
 }
 
@@ -236,45 +219,17 @@ fn to_list(
     }
 }
 
-fn slice_to_index(
-    shape: &[u32],
-    depth: u32,
-    subscripts: &[IndexSlice],
-    indexes: &mut Vec<u32>,
-    base_index: u32,
-) {
-    if depth as usize == shape.len() - 1 {
-        let slice = &subscripts[depth as usize];
-        indexes.extend(slice.iterate().map(|x| base_index + x));
-    } else {
-        let slice = &subscripts[depth as usize];
-        let count = shape[(depth + 1) as usize..].iter().product::<u32>();
-        for i in slice.iterate() {
-            slice_to_index(
-                shape,
-                depth + 1,
-                subscripts,
-                indexes,
-                base_index + (i * count),
-            );
-        }
-    }
-}
-
-fn slice_to_index_slice(subscripts: &PyAny, length: i32) -> PyResult<IndexSlice> {
+fn slice_to_index_slice_op(subscripts: &PyAny, length: i32) -> PyResult<IndexSliceOp> {
     let slice = subscripts.downcast::<PySlice>()?;
-    // if .into is not called, its failing in CI :(
-    let indices = slice.indices(length.into())?;
-    Ok(IndexSlice::new(
-        indices.start as i64,
-        indices.stop as i64,
-        indices.step as i64,
-        length as i64,
+    let indices = slice.indices(length)?;
+    Ok((
+        indices.start as i64..indices.stop as i64,
+        indices.step as i32,
     )
-    .unwrap())
+        .into())
 }
 
-fn subscripts_to_index_slices(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec<IndexSlice>> {
+fn subscripts_to_index_slices_op(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec<IndexSliceOp>> {
     if subscripts.is_instance_of::<PyTuple>() {
         let subscripts_tuple = subscripts.downcast::<PyTuple>()?;
         let length = subscripts_tuple.len();
@@ -283,10 +238,9 @@ fn subscripts_to_index_slices(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec
         for i in 0..length {
             let slice = subscripts_tuple.get_item(i)?;
             if slice.is_instance_of::<PySlice>() {
-                index_slices.push(slice_to_index_slice(slice, shape[i] as i32)?);
+                index_slices.push(slice_to_index_slice_op(slice, shape[i] as i32)?);
             } else if slice.is_instance_of::<PyInt>() {
-                let index = slice.extract().unwrap();
-                index_slices.push(IndexSlice::new(index, index + 1, 1, shape[i] as i64).unwrap());
+                index_slices.push(slice.extract::<i64>().unwrap().into());
             } else {
                 return Err(PyRuntimeError::new_err(format!(
                     "Operation not supported for the given subscripts {:?}",
@@ -295,28 +249,11 @@ fn subscripts_to_index_slices(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec
             }
         }
 
-        for i in length..shape.len() {
-            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
-        }
-
         Ok(index_slices)
     } else if subscripts.is_instance_of::<PyInt>() {
-        let index = subscripts.extract().unwrap();
-        let mut index_slices = Vec::with_capacity(shape.len());
-        index_slices.push(IndexSlice::new(index, index + 1, 1, shape[0] as i64).unwrap());
-        for i in 1..shape.len() {
-            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
-        }
-
-        Ok(index_slices)
+        Ok(vec![subscripts.extract::<i64>().unwrap().into()])
     } else if subscripts.is_instance_of::<PySlice>() {
-        let mut index_slices = Vec::with_capacity(shape.len());
-        index_slices.push(slice_to_index_slice(subscripts, shape[0] as i32)?);
-
-        for i in 1..shape.len() {
-            index_slices.push(IndexSlice::new(0, shape[i] as i64, 1, shape[i] as i64).unwrap());
-        }
-        Ok(index_slices)
+        Ok(vec![slice_to_index_slice_op(subscripts, shape[0] as i32)?])
     } else {
         Err(PyRuntimeError::new_err(format!(
             "Operation not supported for the given subscripts {:?}",
@@ -394,67 +331,35 @@ pub fn into_scalar_array(data: &PyAny, dtype: Dtype) -> PyResult<NdArrayPy> {
     match dtype {
         Dtype::Int8 => {
             let values_array = flatten::<i8>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::Int16 => {
             let values_array = flatten::<i16>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::Int32 => {
             let values_array = flatten::<i32>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::UInt8 => {
             let values_array = flatten::<u8>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::UInt16 => {
             let values_array = flatten::<u16>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::UInt32 => {
             let values_array = flatten::<u32>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::Float32 => {
             let values_array = flatten::<f32>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
         Dtype::Bool => {
             let values_array = flatten::<bool>(data, &shape, 0)?;
-            Ok(
-                NdArray::from_slice(values_array.as_slice().into(), shape, None)
-                    .block_on()
-                    .into(),
-            )
+            Ok(NdArray::from_slice(values_array.as_slice().into(), shape, None).into())
         }
     }
 }
@@ -479,7 +384,7 @@ pub fn array(
 pub fn broadcast_to(data: &PyAny, shape: Vec<u32>) -> PyResult<NdArrayPy> {
     let array = convert_pyobj_into_operand(data)?;
     Ok(NdArrayPy {
-        ndarray: webgpupy::broadcast_to(array.as_ref(), &shape).block_on(),
+        ndarray: webgpupy::broadcast_to(array.as_ref(), &shape),
     })
 }
 
@@ -493,9 +398,7 @@ pub fn repeat(
     let array = convert_pyobj_into_operand(data)?;
     // TODO remove unwrap
     Ok(NdArrayPy {
-        ndarray: webgpupy::repeat(array.as_ref(), &repeats, axis)
-            .block_on()
-            .unwrap(),
+        ndarray: webgpupy::repeat(array.as_ref(), &repeats, axis).unwrap(),
     })
 }
 
@@ -505,7 +408,7 @@ pub fn dstack(
 ) -> PyResult<NdArrayPy> {
     // TODO add array size validation
     Ok(NdArrayPy {
-        ndarray: webgpupy::dstack(tup.as_ref()).block_on(),
+        ndarray: webgpupy::dstack(tup.as_ref()),
     })
 }
 

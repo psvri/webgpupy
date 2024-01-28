@@ -9,8 +9,3 @@ edition = "2021"
 arrow_gpu = {workspace=true}
 wgpu = {workspace=true}
 once_cell = {workspace = true}
-pollster = {workspace = true}
-futures = {workspace = true}
-
-[dev-dependencies]
-tokio = { workspace = true }

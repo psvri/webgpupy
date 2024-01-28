@@ -4,29 +4,22 @@ use webgpupy_core::{ufunc_nin2_nout1, Dtype, NdArray};
 #[macro_export]
 macro_rules! ufunc_compare_nin2_nout1_body {
     ($name: ident, $dyn: ident) => {
-        pub async fn $name(
+        pub fn $name(
             input1: &NdArray,
             input2: &NdArray,
             where_: Option<&NdArray>,
             dtype: Option<Dtype>,
         ) -> NdArray {
-            ufunc_nin2_nout1(
-                |x, y| Box::pin(async { $dyn(x, y).await.into() }),
-                input1,
-                input2,
-                where_,
-                dtype,
-            )
-            .await
+            ufunc_nin2_nout1(|x, y, z| $dyn(x, y, z).into(), input1, input2, where_, dtype)
         }
     };
 }
 
-ufunc_compare_nin2_nout1_body!(greater, gt_dyn);
-ufunc_compare_nin2_nout1_body!(greater_equal, gteq_dyn);
-ufunc_compare_nin2_nout1_body!(lesser, lt_dyn);
-ufunc_compare_nin2_nout1_body!(lesser_equal, lteq_dyn);
-ufunc_compare_nin2_nout1_body!(equal, eq_dyn);
+ufunc_compare_nin2_nout1_body!(greater, gt_op_dyn);
+ufunc_compare_nin2_nout1_body!(greater_equal, gteq_op_dyn);
+ufunc_compare_nin2_nout1_body!(lesser, lt_op_dyn);
+ufunc_compare_nin2_nout1_body!(lesser_equal, lteq_op_dyn);
+ufunc_compare_nin2_nout1_body!(equal, eq_op_dyn);
 
 #[cfg(test)]
 mod test {
