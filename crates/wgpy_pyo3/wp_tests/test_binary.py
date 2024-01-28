@@ -1,6 +1,7 @@
 import webgpupy as wp
 import pytest
 import numpy as np
+from test_utils import *
 
 @pytest.fixture
 def input_array_1():
@@ -18,21 +19,26 @@ def wp_array_1(input_array_1):
 def wp_array_2(input_array_2):
     return wp.array(input_array_2)
 
-def assert_values_nin2(input_array_1, input_array_2, wp_array_1,wp_array_2, wp_fn, np_fn):
-    wp_result = wp_fn(wp_array_1, wp_array_2)
-    np_result = np_fn(input_array_1, input_array_2)
-    np.testing.assert_array_equal(np_result.tolist(), wp_result.tolist())
 
-def assert_values_nin1(input_array_1, wp_array_1, wp_fn, np_fn):
-    wp_result = wp_fn(wp_array_1)
-    np_result = np_fn(input_array_1)
-    np.testing.assert_array_equal(np_result.tolist(), wp_result.tolist())
+@pytest.fixture
+def np_array_1(input_array_1):
+    return np.array(input_array_1)
 
-def test_bitwise_and_u32(input_array_1, input_array_2, wp_array_1, wp_array_2):
-    assert_values_nin2(input_array_1, input_array_2, wp_array_1, wp_array_2, wp.bitwise_and, np.bitwise_and)
 
-def test_bitwise_or_u32(input_array_1, input_array_2, wp_array_1, wp_array_2):
-    assert_values_nin2(input_array_1, input_array_2, wp_array_1, wp_array_2, wp.bitwise_or, np.bitwise_or)
+@pytest.fixture
+def np_array_2(input_array_2):
+    return np.array(input_array_2)
 
-def test_bitwise_or_u32(input_array_1, wp_array_1):
-    assert_values_nin1(input_array_1, wp_array_1, wp.invert, np.invert)
+
+def test_bitwise_and_u32(wp_array_1, wp_array_2, np_array_1, np_array_2):
+    assert_values_nin2(
+        wp_array_1, wp_array_2, np_array_1, np_array_2, 'bitwise_and'
+    )
+
+def test_bitwise_or_u32(wp_array_1, wp_array_2, np_array_1, np_array_2):
+    assert_values_nin2(
+        wp_array_1, wp_array_2, np_array_1, np_array_2, 'bitwise_or'
+    )
+
+def test_bitwise_or_u32(wp_array_1, np_array_1):
+    assert_values_nin1(wp_array_1, np_array_1, 'invert')
