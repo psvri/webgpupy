@@ -21,7 +21,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           prefix-key: "gh-pages-rust"
-      - name: Deploy GitHub Pages
+      - name: Build GitHub Pages
         working-directory: crates/wgpy_pyo3
         run: |
           sudo apt install pandoc -y
@@ -29,6 +29,10 @@ jobs:
           maturin build --out dist --find-interpreter
           pip install webgpupy --find-links dist --force-reinstall
           sphinx-build -b html docs/source/ docs/build/html
+      - name: Deploy GitHub Pages
+        if: ${{ github.event_name == 'push' }}
+        working-directory: crates/wgpy_pyo3
+        run: |
           git worktree add gh-pages
           git config user.name "Deploy from CI"
           git config user.email ""
