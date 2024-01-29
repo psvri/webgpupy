@@ -5,4 +5,4 @@ Examples
 .. toctree::
     :maxdepth: 2
 
-    ray_tracing_in_one_weekend/index.rst
+    wgpy_examples/python/ray_tracing_in_one_weekend/readme.rst
