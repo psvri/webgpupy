@@ -1,5 +1,6 @@
 use arrow_gpu::{
-    array::{broadcast_op_dyn, ArrowArrayGPU, ArrowComputePipeline},
+    array::{broadcast_op_dyn, ArrowArrayGPU},
+    gpu_utils::*,
     kernels::{cast_op_dyn, merge_op_dyn},
 };
 

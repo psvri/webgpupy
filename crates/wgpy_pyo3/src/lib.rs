@@ -6,6 +6,7 @@ pub mod logical;
 pub mod misc;
 pub mod misc_math;
 pub mod ndarraypy;
+pub mod random;
 pub mod trigonometry;
 pub mod types;
 pub mod ufunc;
@@ -28,9 +29,18 @@ pub(crate) fn convert_pyobj_into_operand(data: &PyAny) -> PyResult<OperandPy> {
         let ndarray = NdArray::from_slice([value].as_slice().into(), vec![1], None);
         PyResult::Ok(ndarray.into())
     } else {
+        //TODO implment support for pylist and pytuple
         PyResult::Err(PyTypeError::new_err(
             "Operation not supported for the given values",
         ))
+    }
+}
+
+pub(crate) fn convert_pyobj_into_option_operand(data: &PyAny) -> PyResult<Option<OperandPy>> {
+    if data.is_none() {
+        Ok(None)
+    } else {
+        Ok(Some(convert_pyobj_into_operand(data)?))
     }
 }
 
@@ -84,10 +94,9 @@ pub(crate) fn convert_pyobj_into_vec_ndarray(data: &PyAny) -> PyResult<Vec<&NdAr
     }
 }
 
-/// A Python module implemented in Rust.
 #[pymodule]
 #[pyo3(name = "webgpupy")]
-fn webgpupy_module(_py: Python, m: &PyModule) -> PyResult<()> {
+fn webgpupy_module(py: Python, m: &PyModule) -> PyResult<()> {
     pyo3_log::init();
     ufunc::create_py_items(m)?;
     logical::create_py_items(m)?;
@@ -97,5 +106,6 @@ fn webgpupy_module(_py: Python, m: &PyModule) -> PyResult<()> {
     misc_math::create_py_items(m)?;
     arithmetic::create_py_items(m)?;
     ndarraypy::create_py_items(m)?;
+    random::random_module(py, m)?;
     Ok(())
 }

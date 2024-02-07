@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use arrow_gpu::array::{ArrowComputePipeline, GpuDevice, UInt32ArrayGPU};
+use arrow_gpu::{array::UInt32ArrayGPU, gpu_utils::*};
 use wgpu::Buffer;
 
 use crate::{Dtype, IndexSlice, NdArray, GPU_DEVICE};
@@ -19,11 +19,7 @@ pub fn arange(
     let mut pipeline = ArrowComputePipeline::new(gpu_device.clone(), None);
     let start = start.unwrap_or(0);
     let step = step.unwrap_or(1);
-    let index_slice = IndexSlice {
-        start,
-        stop,
-        step,
-    };
+    let index_slice = IndexSlice { start, stop, step };
     let data = arange_op(&index_slice, &mut pipeline);
 
     //TODO handle dtype
@@ -52,11 +48,10 @@ pub fn arange(
 }
 
 pub fn arange_op(slice: &IndexSlice, pipeline: &mut ArrowComputePipeline) -> Buffer {
-    let input_buffer = pipeline.device.create_gpu_buffer_with_data(&[
-        slice.start,
-        slice.stop,
-        slice.step as u32,
-    ]);
+    let input_buffer =
+        pipeline
+            .device
+            .create_gpu_buffer_with_data(&[slice.start, slice.stop, slice.step as u32]);
 
     let new_buffer_size = slice.element_count() as u64 * 4;
     let dispatch_size = (slice.element_count()).div_ceil(256);

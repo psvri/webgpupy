@@ -6,6 +6,7 @@ members = [
     "crates/wgpy_math",
     "crates/test_utils",
     "crates/wgpy_pyo3",
+    "crates/wgpy_random",
 ]
 
 [workspace.package]
@@ -14,10 +15,13 @@ edition = "2021"
 [workspace.dependencies]
 pyo3 = { version = "0.20.2", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
-arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "f0133a4199bccb5681b91f61fc92ad29ef50e77d"}
+arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "537d9bc08df795e28b0f58e7fd5f07da841c6ba0"}
 wgpu = "0.19.1"
 once_cell = "1.19.0"
 bytemuck = "1.14.1"
 
 [profile.release]
+debug=1
+
+[profile.bench]
 debug=1

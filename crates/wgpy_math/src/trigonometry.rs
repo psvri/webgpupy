@@ -5,6 +5,7 @@ use webgpupy_core::{
 
 ufunc_nin1_nout1_body!(sin, sin_op_dyn);
 ufunc_nin1_nout1_body!(cos, cos_op_dyn);
+ufunc_nin1_nout1_body!(arccos, acos_op_dyn);
 
 pub const COS_TYPES: [UfuncType; 5] = [
     UfuncType::UfuncNin1Nout1Type(

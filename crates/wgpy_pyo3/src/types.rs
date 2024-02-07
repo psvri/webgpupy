@@ -85,6 +85,10 @@ impl DtypePy {
     fn new(#[pyo3(from_py_with = "into_dtypepy")] value: Dtype) -> Self {
         Self { dtype: value }
     }
+
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.dtype)
+    }
 }
 
 pub(crate) fn into_optional_dtypepy(obj: &PyAny) -> Result<Option<Cow<DtypePy>>, PyErr> {
@@ -112,6 +116,12 @@ pub(crate) fn into_dtypepy(obj: &PyAny) -> Result<Dtype, PyErr> {
             "Cannot convert type {} into DtypePy ",
             obj.get_type()
         )))
+    }
+}
+
+impl From<Dtype> for DtypePy {
+    fn from(value: Dtype) -> Self {
+        Self { dtype: value }
     }
 }
 

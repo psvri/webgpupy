@@ -57,6 +57,12 @@ impl NdArrayPy {
         Ok(self.ndarray.shape.clone())
     }
 
+    /// type of ndarry
+    #[getter]
+    pub fn dtype(&self) -> PyResult<DtypePy> {
+        Ok(self.ndarray.dtype.into())
+    }
+
     pub fn __mul__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
         Ok(_multiply(py, slf.as_ref(), other, None, None))
     }

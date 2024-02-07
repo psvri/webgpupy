@@ -15,13 +15,20 @@ pub fn r#where(py: Python<'_>, mask: &PyAny, x: &PyAny, y: &PyAny) -> NdArrayPy 
 }
 
 #[pyfunction]
-pub fn any(py: Python<'_>, x: &PyAny) -> bool {
+pub fn any(_py: Python<'_>, x: &PyAny) -> bool {
     let x = convert_pyobj_into_operand(x).unwrap();
     webgpupy::any(x.as_ref())
+}
+
+#[pyfunction]
+pub fn all(_py: Python<'_>, x: &PyAny) -> bool {
+    let x = convert_pyobj_into_operand(x).unwrap();
+    webgpupy::all(x.as_ref())
 }
 
 pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(r#where, m)?)?;
     m.add_function(wrap_pyfunction!(any, m)?)?;
+    m.add_function(wrap_pyfunction!(all, m)?)?;
     Ok(())
 }

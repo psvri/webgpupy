@@ -1,7 +1,7 @@
-pub mod arithmetic;
-pub mod comparison;
-pub mod misc;
-pub mod trigonometry;
+mod arithmetic;
+mod comparison;
+mod misc;
+mod trigonometry;
 
 pub use arithmetic::*;
 pub use comparison::*;

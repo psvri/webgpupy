@@ -1,4 +1,4 @@
-use arrow_gpu::array::GpuDevice;
+use arrow_gpu::gpu_utils::GpuDevice;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 
