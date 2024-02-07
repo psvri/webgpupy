@@ -3,12 +3,12 @@ use arrow_gpu::{
     gpu_utils::*,
     kernels::{
         add_op_dyn, bitcast_op_dyn, broadcast::Broadcast, max_op_dyn, mul_op_dyn, sub_op_dyn,
-        ArrowMul, ArrowScalarMul, Logical,
+        ArrowScalarMul, Logical,
     },
 };
 use std::{f32::consts::SQRT_2, fmt::Debug, sync::Arc};
 use webgpupy_core::{full, ones, zeros, Dtype, NdArray, ScalarValue, GPU_DEVICE};
-use wgpu::{core::pipeline, Buffer};
+use wgpu::Buffer;
 
 use crate::{iota::*, threefry::*};
 
@@ -232,6 +232,7 @@ impl Generator for ThreeFry2x32 {
 #[cfg(test)]
 mod test {
 
+    use test_utils::float_slice_eq_in_error;
     use webgpupy_core::GPU_DEVICE;
 
     use super::*;
@@ -257,15 +258,18 @@ mod test {
     fn test_threefry_random() {
         let mut rng = ThreeFry2x32::new(1701, None);
 
-        assert_eq!(
+        float_slice_eq_in_error(
             rng.random(&[4]).data.get_raw_values(),
-            vec![0.013084412, 0.41934967, 0.22382236, 0.39694512].into()
+            vec![0.013084412, 0.41934967, 0.22382236, 0.39694512].into(),
         );
 
         rng = ThreeFry2x32::new(1701, None);
-        assert_eq!(
+        float_slice_eq_in_error(
             rng.random(&[6]).data.get_raw_values(),
-            vec![0.21588242, 0.911929, 0.42731953, 0.15760279, 0.7366872, 0.9338119].into()
+            vec![
+                0.21588242, 0.911929, 0.42731953, 0.15760279, 0.7366872, 0.9338119,
+            ]
+            .into(),
         );
     }
 
@@ -273,9 +277,9 @@ mod test {
     fn test_threefry_normal() {
         let mut rng = ThreeFry2x32::new(1701, None);
 
-        assert_eq!(
+        float_slice_eq_in_error(
             rng.normal(&[4]).data.get_raw_values(),
-            vec![-2.2236953, -0.20355737, -0.7593474, -0.26126227].into()
+            vec![-2.2236953, -0.20355737, -0.7593474, -0.26126227].into(),
         );
     }
 }

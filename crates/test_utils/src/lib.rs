@@ -1,3 +1,5 @@
+use arrow_gpu::utils::ScalarArray;
+
 pub fn float_eq_in_error(left: f32, right: f32) -> bool {
     if (left.is_nan() && !right.is_nan()) || (right.is_nan() && !left.is_nan()) {
         return false;
@@ -19,6 +21,22 @@ pub fn float_eq_in_error(left: f32, right: f32) -> bool {
         return false;
     }
     true
+}
+
+pub fn float_slice_eq_in_error(v1: ScalarArray, v2: ScalarArray) {
+    match (v1, v2) {
+        (ScalarArray::F32Vec(x), ScalarArray::F32Vec(y)) => {
+            for i in 0..x.len() {
+                if !float_eq_in_error(x[i], x[i]) {
+                    panic!(
+                        "assertion failed: `(left {} == right {}) \n left: `{:?}` \n right: `{:?}`",
+                        x[i], y[i], x, y
+                    );
+                }
+            }
+        }
+        _ => todo!(),
+    }
 }
 
 #[macro_export]
@@ -154,8 +172,7 @@ macro_rules! test_ufunc_nin2_nout1 {
                 vec![$mask.len() as u32],
                 Some(GPU_DEVICE.clone()),
             );
-            let new_gpu_array =
-                $ufunc(&input1_ndarray, &input2_ndarray, Some(&mask_array), None);
+            let new_gpu_array = $ufunc(&input1_ndarray, &input2_ndarray, Some(&mask_array), None);
             if let ArrowArrayGPU::$output_ty(x) = new_gpu_array.data {
                 let new_values = x.raw_values().unwrap();
                 assert_eq!(&new_values, &$output);
