@@ -17,7 +17,7 @@ pyo3 = { version = "0.20.2", features = ["extension-module"] }
 arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "f0133a4199bccb5681b91f61fc92ad29ef50e77d"}
 wgpu = "0.19.1"
 once_cell = "1.19.0"
-bytemuck = "1.14.1"
+bytemuck = "1.14.3"
 
 [profile.release]
 debug=1
