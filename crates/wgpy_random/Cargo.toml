@@ -1,0 +1,20 @@
+[package]
+name = "webgpupy_random"
+version = "0.1.0"
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+webgpupy_core = {path="../wgpy_core"}
+arrow_gpu = {workspace=true}
+wgpu = {workspace=true}
+bytemuck = { workspace = true }
+
+[dev-dependencies]
+test_utils = {path = "../test_utils"}
+criterion = "0.5.1"
+
+[[bench]]
+name = "encoder_bench"
+harness = false

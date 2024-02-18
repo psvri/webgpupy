@@ -10,7 +10,13 @@ macro_rules! ufunc_compare_nin2_nout1_body {
             where_: Option<&NdArray>,
             dtype: Option<Dtype>,
         ) -> NdArray {
-            ufunc_nin2_nout1(|x, y, z| $dyn(x, y, z).into(), input1, input2, where_, dtype)
+            ufunc_nin2_nout1(
+                |x, y, z| $dyn(x, y, z).into(),
+                input1,
+                input2,
+                where_,
+                dtype,
+            )
         }
     };
 }

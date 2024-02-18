@@ -1,9 +1,6 @@
 use std::{cmp::max, ops::Div, sync::Arc};
 
-use arrow_gpu::{
-    array::{ArrowComputePipeline, UInt32ArrayGPU},
-    kernels::take_op_dyn,
-};
+use arrow_gpu::{array::UInt32ArrayGPU, gpu_utils::*, kernels::take_op_dyn};
 use wgpu::Buffer;
 
 use crate::{NdArray, NdArrayError, NdArrayResult};
@@ -30,6 +27,22 @@ pub fn broadcast_shape(x: &[u32], y: &[u32]) -> NdArrayResult<Vec<u32>> {
     }
 
     Ok(new_shape)
+}
+
+pub fn broadcast_shapes(shapes: &[&[u32]]) -> NdArrayResult<Vec<u32>> {
+    if shapes.len() < 2 {
+        Err(NdArrayError::BroadcastError(
+            "cannot broadcast shapes array of length less than 2".to_string(),
+        ))
+    } else {
+        let mut new_shape = broadcast_shape(shapes[0], shapes[1])?;
+
+        for i in 2..shapes.len() {
+            new_shape = broadcast_shape(&new_shape, shapes[i])?;
+        }
+
+        Ok(new_shape)
+    }
 }
 
 // TODO probably can simpify this
@@ -74,6 +87,19 @@ pub fn broadcast_to(x: &NdArray, shape: &[u32]) -> NdArray {
     let result = broadcast_to_op(x, shape, &mut pipeline);
     pipeline.finish();
     result
+}
+
+/// Broadcast an array to a new shape
+pub fn broadcast_if_required(
+    arr: &NdArray,
+    broadcasted_shape: &[u32],
+    pipeline: &mut ArrowComputePipeline,
+) -> Option<NdArray> {
+    if arr.shape != broadcasted_shape {
+        Some(broadcast_to_op(arr, &broadcasted_shape, pipeline))
+    } else {
+        None
+    }
 }
 
 /// Broadcast an array to a new shape
@@ -193,7 +219,10 @@ mod test {
             [1.0f32, 20.0, 30.0, 40.0].as_ref().into(),
             vec![2, 2, 1],
             &vec![2, 2, 3],
-            vec![1.0f32, 1.0, 1.0, 20.0, 20.0, 20.0, 30.0, 30.0, 30.0, 40.0, 40.0, 40.0].into(),
+            vec![
+                1.0f32, 1.0, 1.0, 20.0, 20.0, 20.0, 30.0, 30.0, 30.0, 40.0, 40.0, 40.0,
+            ]
+            .into(),
         );
     }
 }

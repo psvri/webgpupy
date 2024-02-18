@@ -2,10 +2,10 @@ use std::{ops::Div, sync::Arc};
 
 use arrow_gpu::{
     array::{
-        broadcast_dyn, ArrowArrayGPU, ArrowComputePipeline, BooleanArrayGPU, Float32ArrayGPU,
-        GpuDevice, Int16ArrayGPU, Int32ArrayGPU, Int8ArrayGPU, UInt16ArrayGPU, UInt32ArrayGPU,
-        UInt8ArrayGPU,
+        broadcast_dyn, ArrowArrayGPU, BooleanArrayGPU, Float32ArrayGPU, Int16ArrayGPU,
+        Int32ArrayGPU, Int8ArrayGPU, UInt16ArrayGPU, UInt32ArrayGPU, UInt8ArrayGPU,
     },
+    gpu_utils::*,
     kernels::{cast_dyn, neg_dyn, take_dyn, take_op_dyn},
 };
 

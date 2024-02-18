@@ -38,7 +38,7 @@ fn validate_and_genereate_new_shapes(tup: &[&NdArray]) -> Vec<Vec<u32>> {
 // TODO broadcasting of shapes and validating
 pub fn dstack(tup: &[&NdArray]) -> NdArray {
     if tup.len() == 1 {
-        tup[1].clone_array()
+        tup[0].clone_array()
     } else {
         let new_shapes = validate_and_genereate_new_shapes(tup);
         let mut new_shape = new_shapes[0].clone();

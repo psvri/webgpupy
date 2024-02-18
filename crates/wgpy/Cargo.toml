@@ -9,3 +9,4 @@ edition = "2021"
 webgpupy_core = {path="../wgpy_core"}
 webgpupy_math = {path="../wgpy_math"}
 webgpupy_logical = {path="../wgpy_logical"}
+webgpupy_random = {path="../wgpy_random"}

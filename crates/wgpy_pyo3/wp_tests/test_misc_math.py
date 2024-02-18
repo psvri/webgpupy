@@ -47,3 +47,9 @@ def test_minimum(wp_array_1, wp_array_2, np_array_1, np_array_2):
     assert_values_nin2(
         wp_array_1, wp_array_2, np_array_1, np_array_2, 'minimum'
     )
+
+
+def test_clip(wp_array_2, np_array_2):
+    almost_equals(wp.clip(wp_array_2, 0.0, None), np.clip(np_array_2, 0.0, None))
+    almost_equals(wp.clip(wp_array_2, None, 10.0), np.clip(np_array_2, None, 10.0))
+    almost_equals(wp.clip(wp_array_2, 0.0, 10.0), np.clip(np_array_2, 0.0, 10.0))

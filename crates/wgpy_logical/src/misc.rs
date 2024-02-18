@@ -9,3 +9,12 @@ pub fn any(x: &NdArray) -> bool {
         panic!("Cant perform any on dtype {:?}", x.dtype)
     }
 }
+
+//TODO make it like numpy api
+pub fn all(x: &NdArray) -> bool {
+    if let ArrowArrayGPU::BooleanArrayGPU(y) = &x.data {
+        y.all()
+    } else {
+        panic!("Cant perform any on dtype {:?}", x.dtype)
+    }
+}
