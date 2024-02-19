@@ -1,6 +1,6 @@
 numpy==1.26.4
 maturin==1.4.0
-pytest==8.0.0
+pytest==8.0.1
 pytest-cov==4.1.0
 pytest-xdist==3.5.0
 numpydoc==1.6.0
