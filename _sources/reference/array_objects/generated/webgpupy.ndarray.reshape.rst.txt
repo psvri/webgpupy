@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.reshape
+========================
+
+.. currentmodule:: webgpupy
+
+method
+
+.. automethod:: webgpupy.ndarray.reshape
+
