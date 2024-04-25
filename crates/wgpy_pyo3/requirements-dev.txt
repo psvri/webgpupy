@@ -7,4 +7,4 @@ numpydoc==1.7.0
 sphinx-copybutton==0.5.2
 pydata-sphinx-theme==0.15.2
 nbsphinx==0.9.3
-jax[cpu]==0.4.25
+jax[cpu]==0.4.26
