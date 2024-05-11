@@ -64,9 +64,9 @@ impl<'a> From<&'a str> for Dtype {
     }
 }
 
-impl Into<ArrowType> for Dtype {
-    fn into(self) -> ArrowType {
-        match self {
+impl From<Dtype> for ArrowType {
+    fn from(val: Dtype) -> Self {
+        match val {
             Dtype::Int8 => ArrowType::Int8Type,
             Dtype::Int16 => ArrowType::Int16Type,
             Dtype::Int32 => ArrowType::Int32Type,

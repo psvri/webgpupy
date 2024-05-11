@@ -110,7 +110,7 @@ impl NdArray {
     }
 
     pub fn take(&self, indices: &NdArray, axis: Option<u32>) -> Self {
-        if let Some(_) = axis {
+        if axis.is_some() {
             todo!()
         } else {
             if let ArrowArrayGPU::UInt32ArrayGPU(indices_array) = &indices.data {

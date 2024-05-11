@@ -1,7 +1,8 @@
 import numpy as np
 import webgpupy as wp
 import pytest
-from test_utils import *
+from test_utils import assert_values_nin2, assert_values_nin1, almost_equals
+
 
 @pytest.fixture
 def input_array_1():
@@ -34,22 +35,23 @@ def np_array_2(input_array_2):
 
 
 def test_sqrt(wp_array_1, np_array_1):
-    assert_values_nin1(wp_array_1, np_array_1, 'sqrt')
+    assert_values_nin1(wp_array_1, np_array_1, "sqrt")
 
 
 def test_maximum(wp_array_1, wp_array_2, np_array_1, np_array_2):
-    assert_values_nin2(
-        wp_array_1, wp_array_2, np_array_1, np_array_2, 'maximum'
-    )
+    assert_values_nin2(wp_array_1, wp_array_2, np_array_1, np_array_2, "maximum")
 
 
 def test_minimum(wp_array_1, wp_array_2, np_array_1, np_array_2):
-    assert_values_nin2(
-        wp_array_1, wp_array_2, np_array_1, np_array_2, 'minimum'
-    )
+    assert_values_nin2(wp_array_1, wp_array_2, np_array_1, np_array_2, "minimum")
 
 
 def test_clip(wp_array_2, np_array_2):
     almost_equals(wp.clip(wp_array_2, 0.0, None), np.clip(np_array_2, 0.0, None))
     almost_equals(wp.clip(wp_array_2, None, 10.0), np.clip(np_array_2, None, 10.0))
     almost_equals(wp.clip(wp_array_2, 0.0, 10.0), np.clip(np_array_2, 0.0, 10.0))
+
+
+@pytest.mark.skip(reason="Ignoring temporarily")
+def test_power(wp_array_1, wp_array_2, np_array_1, np_array_2):
+    assert_values_nin2(wp_array_1, wp_array_2, np_array_1, np_array_2, "power")

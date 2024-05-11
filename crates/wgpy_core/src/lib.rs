@@ -8,6 +8,7 @@ pub(crate) mod ndarray;
 pub(crate) mod operand;
 pub(crate) mod types;
 pub(crate) mod ufunc;
+pub(crate) mod utils;
 
 pub use array_routines::*;
 pub use arrow_gpu::utils::ScalarArray;

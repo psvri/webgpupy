@@ -12,8 +12,10 @@ use webgpupy::clip;
 
 impl_ufunc_nin1_nout1!(_sqrt, webgpupy::sqrt);
 impl_ufunc_nin1_nout1!(_cbrt, webgpupy::cbrt);
+impl_ufunc_nin1_nout1!(_absolute, webgpupy::absolute);
 impl_ufunc_nin2_nout1!(_maximum, webgpupy::maximum);
 impl_ufunc_nin2_nout1!(_minimum, webgpupy::minimum);
+impl_ufunc_nin2_nout1!(_power, webgpupy::power);
 
 // TODO add ufunc kwargs support
 #[pyfunction(name = "clip")]
@@ -42,12 +44,15 @@ pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_cbrt, m)?)?;
     m.add_function(wrap_pyfunction!(_maximum, m)?)?;
     m.add_function(wrap_pyfunction!(_minimum, m)?)?;
-    m.add_function(wrap_pyfunction!(_minimum, m)?)?;
+    m.add_function(wrap_pyfunction!(_absolute, m)?)?;
+    m.add_function(wrap_pyfunction!(_power, m)?)?;
     m.add_function(wrap_pyfunction!(clip_, m)?)?;
 
     add_ufunc_nin1_nout1!(m, "sqrt");
     add_ufunc_nin1_nout1!(m, "cbrt");
     add_ufunc_nin2_nout1!(m, "maximum");
     add_ufunc_nin2_nout1!(m, "minimum");
+    add_ufunc_nin2_nout1!(m, "absolute");
+    add_ufunc_nin2_nout1!(m, "power");
     Ok(())
 }

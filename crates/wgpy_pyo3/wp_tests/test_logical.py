@@ -38,6 +38,7 @@ def test_eq_f32(wp_array_1, wp_array_2):
 def test_not_eq_f32(wp_array_1, wp_array_2):
     assert (wp_array_1 != wp_array_2).tolist() == [[True], [False], [True], [False]]
 
+
 @pytest.mark.skip(reason="Ignoring temporarily")
 def test_bitwise_or_u32(input_array_1, input_array_2, wp_array_1, wp_array_2):
     np_where = np.where([True, True, False, False], input_array_1, input_array_2)

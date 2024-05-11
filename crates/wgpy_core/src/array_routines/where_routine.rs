@@ -1,7 +1,10 @@
+use std::borrow::Cow;
+
 use arrow_gpu::{array::ArrowArrayGPU, kernels::merge_dyn};
 
 use crate::{
     broadcast::{broadcast_shape, broadcast_to},
+    utils::Holder,
     NdArray,
 };
 
@@ -10,14 +13,39 @@ pub fn where_(mask: &NdArray, x: &NdArray, y: &NdArray) -> NdArray {
     if let ArrowArrayGPU::BooleanArrayGPU(bool_mask) = &mask.data {
         let broadcast_shape =
             broadcast_shape(&mask.shape, &broadcast_shape(&x.shape, &y.shape).unwrap()).unwrap();
-        let broadcasted_x = broadcast_to(x, &broadcast_shape);
-        let broadcasted_y = broadcast_to(y, &broadcast_shape);
-        let merged_array = merge_dyn(&broadcasted_x.data, &broadcasted_y.data, bool_mask);
-        NdArray {
-            shape: x.shape.clone(),
-            dims: x.dims,
-            data: merged_array,
-            dtype: x.dtype,
+
+        let broadcasted_x = if x.shape != broadcast_shape {
+            Holder::Owned(broadcast_to(x, &broadcast_shape))
+        } else {
+            Holder::Borrowed(x)
+        };
+
+        let broadcasted_y = if y.shape != broadcast_shape {
+            Holder::Owned(broadcast_to(y, &broadcast_shape))
+        } else {
+            Holder::Borrowed(y)
+        };
+
+        let broadcasted_mask = if mask.shape != broadcast_shape {
+            Holder::Owned(broadcast_to(mask, &broadcast_shape))
+        } else {
+            Holder::Borrowed(mask)
+        };
+
+        if let ArrowArrayGPU::BooleanArrayGPU(bool_mask) = &broadcasted_mask.as_ref().data {
+            let merged_array = merge_dyn(
+                &broadcasted_x.as_ref().data,
+                &broadcasted_y.as_ref().data,
+                bool_mask,
+            );
+            NdArray {
+                shape: x.shape.clone(),
+                dims: x.dims,
+                data: merged_array,
+                dtype: x.dtype,
+            }
+        } else {
+            unreachable!()
         }
     } else {
         panic!("Mask is not of boolean type")
