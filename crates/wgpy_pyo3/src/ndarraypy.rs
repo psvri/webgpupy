@@ -10,6 +10,7 @@ use crate::{
     convert_pyobj_into_array_u32, convert_pyobj_into_operand, convert_pyobj_into_scalar,
     convert_pyobj_into_vec_ndarray,
     logical::{_equal, _greater, _lesser},
+    misc_math::_absolute,
     types::{into_dtypepy, into_optional_dtypepy, DtypePy},
 };
 
@@ -75,6 +76,10 @@ impl NdArrayPy {
         Ok(_divide(py, slf.as_ref(), other, None, None))
     }
 
+    pub fn __rtruediv__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+        Ok(_divide(py, other, slf.as_ref(), None, None))
+    }
+
     pub fn __add__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
         Ok(_add(py, slf.as_ref(), other, None, None))
     }
@@ -111,6 +116,10 @@ impl NdArrayPy {
         Ok(NdArrayPy {
             ndarray: self.ndarray.neg(),
         })
+    }
+
+    pub fn __abs__(slf: &PyCell<Self>, py: Python<'_>) -> PyResult<Self> {
+        Ok(_absolute(py, slf.as_ref(), None, None))
     }
 
     pub fn __eq__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {

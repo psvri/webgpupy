@@ -160,12 +160,12 @@ impl Generator for ThreeFry2x32 {
         let min_values = &min_value.data;
         let max_values = &max_value.data;
 
-        let diff = sub_op_dyn(&max_values, &min_values, pipeline);
+        let diff = sub_op_dyn(max_values, min_values, pipeline);
 
         floats = mul_op_dyn(&floats, &diff, pipeline);
-        floats = add_op_dyn(&floats, &min_values, pipeline);
+        floats = add_op_dyn(&floats, min_values, pipeline);
 
-        let data = max_op_dyn(&min_values, &floats, pipeline);
+        let data = max_op_dyn(min_values, &floats, pipeline);
 
         let shape = shape.to_vec();
         let dims = shape.len() as u16;

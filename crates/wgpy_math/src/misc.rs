@@ -1,11 +1,13 @@
 use arrow_gpu::{gpu_utils::ArrowComputePipeline, kernels::*};
 use webgpupy_core::{
     broadcast_shape, broadcast_shapes, broadcast_to_op, ufunc_nin1_nout1, ufunc_nin1_nout1_body,
-    Dtype, NdArray,
+    ufunc_nin2_nout1, ufunc_nin2_nout1_body, Dtype, NdArray,
 };
 
 ufunc_nin1_nout1_body!(sqrt, sqrt_op_dyn);
 ufunc_nin1_nout1_body!(cbrt, cbrt_op_dyn);
+ufunc_nin1_nout1_body!(absolute, abs_op_dyn);
+ufunc_nin2_nout1_body!(power, power_op_dyn);
 
 pub fn clip(a: &NdArray, a_min: Option<&NdArray>, a_max: Option<&NdArray>) -> NdArray {
     match (a_min, a_max) {
@@ -101,6 +103,18 @@ pub fn clip(a: &NdArray, a_min: Option<&NdArray>, a_max: Option<&NdArray>) -> Nd
             }
         }
     }
+}
+
+pub fn cross(a: &NdArray, b: &NdArray) -> NdArray {
+    let shader = match (a.dtype, b.dtype) {
+        (Dtype::Float32, Dtype::Float32) => include_str!("../compute_shader/f32/cross.wgsl"),
+        _ => panic!(
+            "cross not supported for type {:?} and {:?}",
+            a.dtype, b.dtype
+        ),
+    };
+
+    todo!()
 }
 
 #[cfg(test)]

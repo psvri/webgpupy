@@ -96,7 +96,7 @@ pub fn broadcast_if_required(
     pipeline: &mut ArrowComputePipeline,
 ) -> Option<NdArray> {
     if arr.shape != broadcasted_shape {
-        Some(broadcast_to_op(arr, &broadcasted_shape, pipeline))
+        Some(broadcast_to_op(arr, broadcasted_shape, pipeline))
     } else {
         None
     }
