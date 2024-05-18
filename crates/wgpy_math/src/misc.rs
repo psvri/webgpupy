@@ -105,18 +105,6 @@ pub fn clip(a: &NdArray, a_min: Option<&NdArray>, a_max: Option<&NdArray>) -> Nd
     }
 }
 
-pub fn cross(a: &NdArray, b: &NdArray) -> NdArray {
-    let shader = match (a.dtype, b.dtype) {
-        (Dtype::Float32, Dtype::Float32) => include_str!("../compute_shader/f32/cross.wgsl"),
-        _ => panic!(
-            "cross not supported for type {:?} and {:?}",
-            a.dtype, b.dtype
-        ),
-    };
-
-    todo!()
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
