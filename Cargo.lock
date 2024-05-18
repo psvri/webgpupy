@@ -65,7 +65,7 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 [[package]]
 name = "arrow_gpu"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_arithmetic",
  "arrow_gpu_array",
@@ -80,7 +80,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_arithmetic"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -89,7 +89,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_array"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "bytemuck",
  "futures-intrusive",
@@ -102,7 +102,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_cast"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -111,7 +111,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_compare"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -120,7 +120,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_logical"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_arithmetic",
  "arrow_gpu_array",
@@ -130,7 +130,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_math"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -139,7 +139,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_routines"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -148,7 +148,7 @@ dependencies = [
 [[package]]
 name = "arrow_gpu_trigonometry"
 version = "0.1.0"
-source = "git+https://github.com/psvri/arrow-gpu.git?rev=639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e#639cbdfc92c51e3d1fd4e4c8804675b9ebe3053e"
+source = "git+https://github.com/psvri/arrow-gpu.git?rev=ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624#ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"
 dependencies = [
  "arrow_gpu_array",
  "wgpu",
@@ -210,9 +210,9 @@ checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
 name = "bytemuck"
-version = "1.15.0"
+version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d6d68c57235a3a081186990eca2867354726650f42f7516ca50c28d6281fd15"
+checksum = "78834c15cb5d5efe3452d58b1e8ba890dd62d21907f867f383358198e56ebca5"
 
 [[package]]
 name = "cast"

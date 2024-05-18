@@ -9,6 +9,7 @@ use pyo3::prelude::*;
 use pyo3::{pyfunction, Python};
 use std::borrow::Cow;
 use webgpupy::clip;
+use webgpupy::cross;
 
 impl_ufunc_nin1_nout1!(_sqrt, webgpupy::sqrt);
 impl_ufunc_nin1_nout1!(_cbrt, webgpupy::cbrt);
@@ -39,6 +40,14 @@ pub fn clip_<'a>(
     py.allow_threads(|| clip(&a.ndarray, min_arr, max_arr).into())
 }
 
+#[pyfunction(name = "cross")]
+#[pyo3(signature = (a, b))]
+pub fn cross_<'a>(py: Python<'_>, a: &'a PyAny, b: &'a PyAny) -> NdArrayPy {
+    let x = convert_pyobj_into_operand(a).unwrap();
+    let y = convert_pyobj_into_operand(b).unwrap();
+    py.allow_threads(|| cross(x.as_ref(), y.as_ref()).into())
+}
+
 pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_sqrt, m)?)?;
     m.add_function(wrap_pyfunction!(_cbrt, m)?)?;
@@ -47,6 +56,8 @@ pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_absolute, m)?)?;
     m.add_function(wrap_pyfunction!(_power, m)?)?;
     m.add_function(wrap_pyfunction!(clip_, m)?)?;
+
+    m.add_function(wrap_pyfunction!(cross_, m)?)?;
 
     add_ufunc_nin1_nout1!(m, "sqrt");
     add_ufunc_nin1_nout1!(m, "cbrt");

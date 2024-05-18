@@ -52,6 +52,20 @@ def test_clip(wp_array_2, np_array_2):
     almost_equals(wp.clip(wp_array_2, 0.0, 10.0), np.clip(np_array_2, 0.0, 10.0))
 
 
+def test_cross():
+    def test_cross_results(input1, input2):
+        almost_equals(
+            wp.cross(wp.array(input1), wp.array(input2)), np.cross(input1, input2)
+        )
+
+    test_cross_results(
+        [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0, 9.0], [0.0, 0.0, 0.0]]
+    )
+    test_cross_results([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0], [11.0, 12.0]])
+    test_cross_results([[7.0, 8.0], [11.0, 12.0]], [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    test_cross_results([[1.0, 2.0], [4.0, 5.0]], [[7.0, 8.0], [11.0, 12.0]])
+
+
 @pytest.mark.skip(reason="Ignoring temporarily")
 def test_power(wp_array_1, wp_array_2, np_array_1, np_array_2):
     assert_values_nin2(wp_array_1, wp_array_2, np_array_1, np_array_2, "power")
