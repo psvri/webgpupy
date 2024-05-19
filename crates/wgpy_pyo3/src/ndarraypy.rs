@@ -214,23 +214,23 @@ fn to_list(
     if depth as usize == shape.len() - 1 {
         let len = shape[shape.len() - 1] as usize;
         let list = match values {
-            ScalarArray::F32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::U32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::U16Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::U8Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::I32Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::I16Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::I8Vec(x) => PyList::new(py, &x[*pos..*pos + len]),
-            ScalarArray::BOOLVec(x) => PyList::new(py, &x[*pos..*pos + len]),
+            ScalarArray::F32Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::U32Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::U16Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::U8Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::I32Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::I16Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::I8Vec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
+            ScalarArray::BOOLVec(x) => PyList::new_bound(py, &x[*pos..*pos + len]),
         };
         *pos += len;
-        PyResult::Ok(list.into_py(py))
+        PyResult::Ok(list.unbind())
     } else {
-        let list = PyList::empty(py);
+        let list = PyList::empty_bound(py);
         for _ in 0..shape[depth as usize] {
             list.append(to_list(py, values, depth + 1, shape, pos)?)?;
         }
-        PyResult::Ok(list.into_py(py))
+        PyResult::Ok(list.unbind())
     }
 }
 

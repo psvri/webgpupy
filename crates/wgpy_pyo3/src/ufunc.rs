@@ -1,4 +1,6 @@
 use pyo3::{
+    intern,
+    prelude::*,
     pyclass, pymethods,
     types::{PyAny, PyDict, PyModule, PyString, PyTuple},
     Py, PyObject, PyResult, Python,
@@ -22,12 +24,12 @@ impl Ufunc {
     }
 
     #[getter(__doc__)]
-    fn __doc__<'a>(&self, py: Python<'a>) -> PyResult<&'a PyString> {
-        let resources = py.import("pkgutil")?;
-        let function = resources.getattr("get_data")?;
+    fn __doc__<'a>(&self, py: Python<'a>) -> PyResult<Py<PyString>> {
+        let resources = py.import_bound("pkgutil")?;
+        let function = resources.getattr(intern!(py, "get_data"))?;
         let args = ("webgpupy", self.doc_string_path);
         let result = function.call(args, None)?.getattr("decode")?;
-        let result_string = result.call1(("utf-8",))?.downcast()?;
+        let result_string = result.call1(("utf-8",))?.downcast_into::<PyString>()?.unbind();
         PyResult::Ok(result_string)
     }
 
