@@ -16,7 +16,7 @@ edition = "2021"
 pyo3 = { version = "0.20.3", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
 arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "ba14a9e919cf05aeee3a1c20ebd60b9d9c2db624"}
-wgpu = "0.20.0"
+wgpu = "0.20.1"
 once_cell = "1.19.0"
 bytemuck = "1.15.0"
 
