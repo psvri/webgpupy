@@ -1,0 +1,30 @@
+﻿webgpupy.ndarray
+================
+
+.. currentmodule:: webgpupy
+
+.. autoclass:: ndarray
+
+   
+
+   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
+      .. autosummary::
+         :toctree:
+      
+         ndarray.astype
+         ndarray.display
+         ndarray.flatten
+         ndarray.reshape
+         ndarray.tolist
+
+
+
+   
+
+   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
+      .. autosummary::
+         :toctree:
+      
+         ndarray.dtype
+         ndarray.shape
+
