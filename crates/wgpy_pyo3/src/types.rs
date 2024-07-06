@@ -2,9 +2,10 @@ use std::borrow::Cow;
 
 use pyo3::{
     exceptions::PyTypeError,
+    prelude::PyAnyMethods,
     pyclass, pymethods,
     types::{PyBool, PyString},
-    FromPyObject, PyAny, PyCell, PyErr, PyResult,
+    Bound, FromPyObject, PyAny, PyErr, PyResult,
 };
 use webgpupy::{Dtype, NdArray};
 
@@ -91,10 +92,12 @@ impl DtypePy {
     }
 }
 
-pub(crate) fn into_optional_dtypepy(obj: &PyAny) -> Result<Option<Cow<DtypePy>>, PyErr> {
+pub(crate) fn into_optional_dtypepy<'a>(
+    obj: &'a Bound<'a, PyAny>,
+) -> Result<Option<Cow<'a, DtypePy>>, PyErr> {
     if obj.is_none() {
         PyResult::Ok(None)
-    } else if let Ok(c) = obj.downcast::<PyCell<DtypePy>>() {
+    } else if let Ok(c) = obj.downcast::<DtypePy>() {
         PyResult::Ok(Some(Cow::Borrowed(c.get())))
     } else if obj.is_instance_of::<PyString>() {
         PyResult::Ok(Some(Cow::Owned(DtypePy {
@@ -108,7 +111,7 @@ pub(crate) fn into_optional_dtypepy(obj: &PyAny) -> Result<Option<Cow<DtypePy>>,
     }
 }
 
-pub(crate) fn into_dtypepy(obj: &PyAny) -> Result<Dtype, PyErr> {
+pub(crate) fn into_dtypepy(obj: &Bound<PyAny>) -> Result<Dtype, PyErr> {
     if obj.is_instance_of::<PyString>() {
         Ok(Dtype::from(obj.extract::<&str>()?))
     } else {

@@ -72,15 +72,15 @@ mod tests {
     #[test]
     fn test_arange() {
         let input_1 = arange(None, 10, None, None, None);
-        let result = (0..10).into_iter().collect::<Vec<u32>>();
+        let result = (0..10).collect::<Vec<u32>>();
         assert_eq!(input_1.data.get_raw_values(), result.into());
 
         let input_1 = arange(Some(2), 10, None, None, None);
-        let result = (2..10).into_iter().collect::<Vec<u32>>();
+        let result = (2..10).collect::<Vec<u32>>();
         assert_eq!(input_1.data.get_raw_values(), result.into());
 
         let input_1 = arange(Some(3), 10, Some(2), None, None);
-        let result = (3..10).into_iter().step_by(2).collect::<Vec<u32>>();
+        let result = (3..10).step_by(2).collect::<Vec<u32>>();
         assert_eq!(input_1.data.get_raw_values(), result.into());
     }
 }

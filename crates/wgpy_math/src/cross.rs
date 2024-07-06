@@ -3,9 +3,8 @@ use std::sync::Arc;
 use arrow_gpu::{
     array::{ArrayUtils, ArrowArrayGPU, ArrowPrimitiveType, PrimitiveArrayGpu},
     gpu_utils::ArrowComputePipeline,
-    kernels::broadcast,
 };
-use webgpupy_core::{broadcast_shapes, Dtype, NdArray};
+use webgpupy_core::NdArray;
 
 trait CrossType: ArrowPrimitiveType {
     const CROSS_SHADER: &'static str;

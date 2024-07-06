@@ -135,7 +135,7 @@ mod test {
     #[test]
     fn test_repeat() {
         let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
-        let new_gpu_array = repeat(&input, &vec![2], None).unwrap();
+        let new_gpu_array = repeat(&input, &[2], None).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 2.0, 3.0, 3.0].into()
@@ -173,7 +173,7 @@ mod test {
     #[test]
     fn test_repeat_with_axis() {
         let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
-        let new_gpu_array = repeat(&input, &vec![2], Some(2)).unwrap();
+        let new_gpu_array = repeat(&input, &[2], Some(2)).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 2.0, 3.0, 3.0].into()
@@ -181,7 +181,7 @@ mod test {
         assert_eq!(&new_gpu_array.shape, &[1, 1, 6]);
 
         let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
-        let new_gpu_array = repeat(&input, &vec![1, 2, 3], Some(2)).unwrap();
+        let new_gpu_array = repeat(&input, &[1, 2, 3], Some(2)).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 2.0, 3.0, 3.0, 3.0].into()
@@ -189,7 +189,7 @@ mod test {
         assert_eq!(&new_gpu_array.shape, &[1, 1, 6]);
 
         let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
-        let new_gpu_array = repeat(&input, &vec![2], Some(1)).unwrap();
+        let new_gpu_array = repeat(&input, &[2], Some(1)).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0].into()
@@ -201,7 +201,7 @@ mod test {
             vec![1, 2, 3],
             None,
         );
-        let new_gpu_array = repeat(&input, &vec![2, 1], Some(1)).unwrap();
+        let new_gpu_array = repeat(&input, &[2, 1], Some(1)).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0].into()

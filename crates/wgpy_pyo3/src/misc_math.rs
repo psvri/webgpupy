@@ -21,34 +21,26 @@ impl_ufunc_nin2_nout1!(_power, webgpupy::power);
 // TODO add ufunc kwargs support
 #[pyfunction(name = "clip")]
 #[pyo3(signature = (a, a_min, a_max))]
-pub fn clip_<'a>(
+pub fn clip_(
     py: Python<'_>,
     a: &NdArrayPy,
     #[pyo3(from_py_with = "convert_pyobj_into_option_operand")] a_min: Option<OperandPy>,
     #[pyo3(from_py_with = "convert_pyobj_into_option_operand")] a_max: Option<OperandPy>,
 ) -> NdArrayPy {
-    let min_arr = if let Some(a_min) = a_min.as_ref() {
-        Some(a_min.as_ref())
-    } else {
-        None
-    };
-    let max_arr = if let Some(a_max) = a_max.as_ref() {
-        Some(a_max.as_ref())
-    } else {
-        None
-    };
+    let min_arr = a_min.as_ref().map(|a_min| a_min.as_ref());
+    let max_arr = a_max.as_ref().map(|a_max| a_max.as_ref());
     py.allow_threads(|| clip(&a.ndarray, min_arr, max_arr).into())
 }
 
 #[pyfunction(name = "cross")]
 #[pyo3(signature = (a, b))]
-pub fn cross_<'a>(py: Python<'_>, a: &'a PyAny, b: &'a PyAny) -> NdArrayPy {
+pub fn cross_<'a>(py: Python<'_>, a: &'a Bound<'a, PyAny>, b: &'a Bound<'a, PyAny>) -> NdArrayPy {
     let x = convert_pyobj_into_operand(a).unwrap();
     let y = convert_pyobj_into_operand(b).unwrap();
     py.allow_threads(|| cross(x.as_ref(), y.as_ref()).into())
 }
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_sqrt, m)?)?;
     m.add_function(wrap_pyfunction!(_cbrt, m)?)?;
     m.add_function(wrap_pyfunction!(_maximum, m)?)?;

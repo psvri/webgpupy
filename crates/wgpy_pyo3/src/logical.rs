@@ -14,7 +14,7 @@ impl_ufunc_nin2_nout1!(_greater, webgpupy::greater);
 impl_ufunc_nin2_nout1!(_lesser, webgpupy::lesser);
 impl_ufunc_nin2_nout1!(_equal, webgpupy::equal);
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_greater, m)?)?;
     m.add_function(wrap_pyfunction!(_lesser, m)?)?;
     m.add_function(wrap_pyfunction!(_equal, m)?)?;
