@@ -21,8 +21,8 @@ pub enum ScalarValuePy {
     BOOL(bool),
 }
 
-impl<'s> FromPyObject<'s> for ScalarValuePy {
-    fn extract(ob: &'s PyAny) -> PyResult<Self> {
+impl<'py> FromPyObject<'py> for ScalarValuePy {
+    fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
         if ob.is_instance_of::<PyBool>() {
             PyResult::Ok(Self::BOOL(ob.extract::<bool>().unwrap()))
         } else if let Ok(value) = ob.extract::<i32>() {
