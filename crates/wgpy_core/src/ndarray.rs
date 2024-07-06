@@ -350,10 +350,7 @@ mod test {
         for i in 0..3 {
             let items = array.get_items(&[(0..).into(), (0..).into(), i.into()]);
 
-            let result = (0..500)
-                .into_iter()
-                .map(|x| ((x * 3) + i) as f32)
-                .collect::<Vec<f32>>();
+            let result = (0..500).map(|x| ((x * 3) + i) as f32).collect::<Vec<f32>>();
 
             assert_eq!(&items.shape, &[10, 50]);
 

@@ -143,7 +143,7 @@ mod test {
         assert_eq!(&new_gpu_array.shape, &[6]);
 
         let input = NdArray::from_slice([1.0f32, 2.0, 3.0].as_ref().into(), vec![1, 1, 3], None);
-        let new_gpu_array = repeat(&input, &vec![2, 1, 3], None).unwrap();
+        let new_gpu_array = repeat(&input, &[2, 1, 3], None).unwrap();
         assert_eq!(
             new_gpu_array.data.get_raw_values(),
             vec![1.0f32, 1.0, 2.0, 3.0, 3.0, 3.0].into()
