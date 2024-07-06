@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use pyo3::{exceptions::PyRuntimeError, prelude::*, types::*};
+use pyo3::{exceptions::*, prelude::*, types::*};
 use webgpupy::*;
 
 use crate::{
@@ -64,52 +64,52 @@ impl NdArrayPy {
         Ok(self.ndarray.dtype.into())
     }
 
-    pub fn __mul__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_multiply(py, slf.as_ref(), other, None, None))
+    pub fn __mul__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_multiply(py, slf, other, None, None))
     }
 
-    pub fn __rmul__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_multiply(py, slf.as_ref(), other, None, None))
+    pub fn __rmul__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_multiply(py, slf, other, None, None))
     }
 
-    pub fn __truediv__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_divide(py, slf.as_ref(), other, None, None))
+    pub fn __truediv__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_divide(py, slf, other, None, None))
     }
 
-    pub fn __rtruediv__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_divide(py, other, slf.as_ref(), None, None))
+    pub fn __rtruediv__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_divide(py, other, slf, None, None))
     }
 
-    pub fn __add__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_add(py, slf.as_ref(), other, None, None))
+    pub fn __add__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_add(py, slf, other, None, None))
     }
 
-    pub fn __radd__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_add(py, slf.as_ref(), other, None, None))
+    pub fn __radd__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_add(py, slf, other, None, None))
     }
 
-    pub fn __sub__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_subtract(py, slf.as_ref(), other, None, None))
+    pub fn __sub__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_subtract(py, slf, other, None, None))
     }
 
-    pub fn __rsub__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_subtract(py, other, slf.as_ref(), None, None))
+    pub fn __rsub__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_subtract(py, other, slf, None, None))
     }
 
-    pub fn __lt__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_lesser(py, slf.as_ref(), other, None, None))
+    pub fn __lt__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_lesser(py, slf, other, None, None))
     }
 
-    pub fn __gt__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_greater(py, slf.as_ref(), other, None, None))
+    pub fn __gt__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_greater(py, slf, other, None, None))
     }
 
-    pub fn __and__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_bitwise_and(py, slf.as_ref(), other, None, None))
+    pub fn __and__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_bitwise_and(py, slf, other, None, None))
     }
 
-    pub fn __or__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_bitwise_or(py, slf.as_ref(), other, None, None))
+    pub fn __or__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_bitwise_or(py, slf, other, None, None))
     }
 
     pub fn __neg__(&self) -> PyResult<Self> {
@@ -118,17 +118,18 @@ impl NdArrayPy {
         })
     }
 
-    pub fn __abs__(slf: &PyCell<Self>, py: Python<'_>) -> PyResult<Self> {
-        Ok(_absolute(py, slf.as_ref(), None, None))
+    pub fn __abs__(slf: &Bound<Self>, py: Python<'_>) -> PyResult<Self> {
+        Ok(_absolute(py, slf, None, None))
     }
 
-    pub fn __eq__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        Ok(_equal(py, slf.as_ref(), other, None, None))
+    pub fn __eq__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        Ok(_equal(py, slf, other, None, None))
     }
 
-    pub fn __ne__(slf: &PyCell<Self>, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
-        let eq = _equal(py, slf.as_ref(), other, None, None).into_py(py);
-        Ok(_invert(py, eq.into_ref(py), None, None))
+    pub fn __ne__(slf: &Bound<Self>, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
+        let binding = _equal(py, slf, other, None, None).into_py(py);
+        let eq = binding.bind(py);
+        Ok(_invert(py, eq, None, None))
     }
 
     pub fn astype(&self, #[pyo3(from_py_with = "into_dtypepy")] dtype: Dtype) -> PyResult<Self> {
@@ -145,7 +146,7 @@ impl NdArrayPy {
         })
     }
 
-    pub fn __getitem__(&self, py: Python<'_>, other: &PyAny) -> PyResult<Self> {
+    pub fn __getitem__(&self, py: Python<'_>, other: &Bound<PyAny>) -> PyResult<Self> {
         let index_slices = subscripts_to_index_slices_op(other, &self.ndarray.shape)?;
         let ndarray = py.allow_threads(|| self.ndarray.get_items(&index_slices));
 
@@ -190,7 +191,7 @@ pub fn array_zeros(
 pub fn array_full(
     py: Python<'_>,
     shape: Vec<u32>,
-    data: &PyAny,
+    data: &Bound<PyAny>,
     #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
 ) -> PyResult<NdArrayPy> {
     let operand = convert_pyobj_into_scalar(data)?;
@@ -234,7 +235,7 @@ fn to_list(
     }
 }
 
-fn slice_to_index_slice_op(subscripts: &PyAny, length: i32) -> PyResult<IndexSliceOp> {
+fn slice_to_index_slice_op(subscripts: &Bound<PyAny>, length: i32) -> PyResult<IndexSliceOp> {
     let slice = subscripts.downcast::<PySlice>()?;
     // Test fails in CI without into 🤔
     let indices = slice.indices(length.into())?;
@@ -245,7 +246,10 @@ fn slice_to_index_slice_op(subscripts: &PyAny, length: i32) -> PyResult<IndexSli
         .into())
 }
 
-fn subscripts_to_index_slices_op(subscripts: &PyAny, shape: &[u32]) -> PyResult<Vec<IndexSliceOp>> {
+fn subscripts_to_index_slices_op(
+    subscripts: &Bound<PyAny>,
+    shape: &[u32],
+) -> PyResult<Vec<IndexSliceOp>> {
     if subscripts.is_instance_of::<PyTuple>() {
         let subscripts_tuple = subscripts.downcast::<PyTuple>()?;
         let length = subscripts_tuple.len();
@@ -254,7 +258,7 @@ fn subscripts_to_index_slices_op(subscripts: &PyAny, shape: &[u32]) -> PyResult<
         for i in 0..length {
             let slice = subscripts_tuple.get_item(i)?;
             if slice.is_instance_of::<PySlice>() {
-                index_slices.push(slice_to_index_slice_op(slice, shape[i] as i32)?);
+                index_slices.push(slice_to_index_slice_op(&slice, shape[i] as i32)?);
             } else if slice.is_instance_of::<PyInt>() {
                 index_slices.push(slice.extract::<i64>().unwrap().into());
             } else {
@@ -278,11 +282,11 @@ fn subscripts_to_index_slices_op(subscripts: &PyAny, shape: &[u32]) -> PyResult<
     }
 }
 
-pub fn get_shape(data: &PyAny) -> PyResult<Vec<u32>> {
+pub fn get_shape(data: &Bound<PyAny>) -> PyResult<Vec<u32>> {
     if data.is_instance_of::<PyList>() {
         let mut shape = vec![];
         shape.push(data.len()? as u32);
-        shape.extend(get_shape(data.get_item(0)?)?);
+        shape.extend(get_shape(&data.get_item(0)?)?);
         Ok(shape)
     } else if data.is_instance_of::<PyFloat>()
         || data.is_instance_of::<PyInt>()
@@ -296,9 +300,9 @@ pub fn get_shape(data: &PyAny) -> PyResult<Vec<u32>> {
     }
 }
 
-pub fn get_type(data: &PyAny) -> PyResult<Dtype> {
+pub fn get_type(data: &Bound<PyAny>) -> PyResult<Dtype> {
     if data.is_instance_of::<PyList>() {
-        get_type(data.get_item(0)?)
+        get_type(&data.get_item(0)?)
     } else if data.is_instance_of::<PyBool>() {
         Ok(Dtype::Bool)
     } else if data.is_instance_of::<PyFloat>() {
@@ -313,7 +317,7 @@ pub fn get_type(data: &PyAny) -> PyResult<Dtype> {
 }
 
 pub fn flatten<T: PyObectToRustPrimitive>(
-    data: &PyAny,
+    data: &Bound<PyAny>,
     shape: &[u32],
     depth: usize,
 ) -> PyResult<Vec<T>> {
@@ -325,7 +329,7 @@ pub fn flatten<T: PyObectToRustPrimitive>(
         } else {
             let mut values = vec![];
             for i in 0..shape[depth] {
-                values.extend(flatten(data.get_item(i)?, shape, depth + 1)?);
+                values.extend(flatten(&data.get_item(i)?, shape, depth + 1)?);
             }
             Ok(values)
         }
@@ -341,7 +345,7 @@ pub fn flatten<T: PyObectToRustPrimitive>(
     }
 }
 
-pub fn into_scalar_array(data: &PyAny, dtype: Dtype) -> PyResult<NdArrayPy> {
+pub fn into_scalar_array(data: &Bound<PyAny>, dtype: Dtype) -> PyResult<NdArrayPy> {
     let shape = get_shape(data)?;
 
     match dtype {
@@ -383,7 +387,7 @@ pub fn into_scalar_array(data: &PyAny, dtype: Dtype) -> PyResult<NdArrayPy> {
 /// Creates a new array
 #[pyfunction(name = "array")]
 pub fn array(
-    data: &PyAny,
+    data: &Bound<PyAny>,
     #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
 ) -> PyResult<NdArrayPy> {
     match dtype.as_ref() {
@@ -397,7 +401,7 @@ pub fn array(
 
 /// Creates a new array
 #[pyfunction(name = "broadcast_to")]
-pub fn broadcast_to(data: &PyAny, shape: Vec<u32>) -> PyResult<NdArrayPy> {
+pub fn broadcast_to(data: &Bound<PyAny>, shape: Vec<u32>) -> PyResult<NdArrayPy> {
     let array = convert_pyobj_into_operand(data)?;
     Ok(NdArrayPy {
         ndarray: webgpupy::broadcast_to(array.as_ref(), &shape),
@@ -407,7 +411,7 @@ pub fn broadcast_to(data: &PyAny, shape: Vec<u32>) -> PyResult<NdArrayPy> {
 /// Repeats elements in an array
 #[pyfunction(name = "repeat")]
 pub fn repeat(
-    data: &PyAny,
+    data: &Bound<PyAny>,
     #[pyo3(from_py_with = "convert_pyobj_into_array_u32")] repeats: Vec<u32>,
     axis: Option<u32>,
 ) -> PyResult<NdArrayPy> {
@@ -420,15 +424,24 @@ pub fn repeat(
 
 #[pyfunction(name = "dstack")]
 pub fn dstack(
-    #[pyo3(from_py_with = "convert_pyobj_into_vec_ndarray")] tup: Vec<&NdArray>,
+    #[pyo3(from_py_with = "convert_pyobj_into_vec_ndarray")] refs: Vec<Bound<NdArrayPy>>,
 ) -> PyResult<NdArrayPy> {
     // TODO add array size validation
-    Ok(NdArrayPy {
-        ndarray: webgpupy::dstack(tup.as_ref()),
-    })
+
+    let mut tup = vec![];
+
+    for rf in &refs {
+        tup.push(&rf.get().ndarray)
+    }
+
+    let result = NdArrayPy {
+        ndarray: webgpupy::dstack(&tup),
+    };
+
+    Ok(result)
 }
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(array_zeros, m)?)?;
     m.add_function(wrap_pyfunction!(array_ones, m)?)?;
     m.add_function(wrap_pyfunction!(array_full, m)?)?;

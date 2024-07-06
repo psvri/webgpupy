@@ -15,7 +15,7 @@ impl_ufunc_nin2_nout1!(_bitwise_and, webgpupy::bitwise_and);
 impl_ufunc_nin2_nout1!(_bitwise_or, webgpupy::bitwise_or);
 impl_ufunc_nin1_nout1!(_invert, webgpupy::invert);
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_bitwise_and, m)?)?;
     m.add_function(wrap_pyfunction!(_bitwise_or, m)?)?;
     m.add_function(wrap_pyfunction!(_invert, m)?)?;

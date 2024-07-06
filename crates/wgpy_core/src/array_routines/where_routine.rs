@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use arrow_gpu::{array::ArrowArrayGPU, kernels::merge_dyn};
 
 use crate::{

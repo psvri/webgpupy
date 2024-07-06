@@ -16,9 +16,11 @@ use pyo3::{exceptions::PyTypeError, prelude::*, types::*};
 use types::OperandPy;
 use webgpupy::{NdArray, ScalarValue};
 
-pub(crate) fn convert_pyobj_into_operand(data: &PyAny) -> PyResult<OperandPy> {
+pub(crate) fn convert_pyobj_into_operand<'a>(
+    data: &'a Bound<'a, PyAny>,
+) -> PyResult<OperandPy<'a>> {
     if data.is_instance_of::<NdArrayPy>() {
-        let ndarray: &PyCell<NdArrayPy> = data.downcast()?;
+        let ndarray = data.downcast::<NdArrayPy>()?;
         PyResult::Ok((&ndarray.get().ndarray).into())
     } else if data.is_instance_of::<PyFloat>() {
         let value = data.extract::<f32>()?;
@@ -36,7 +38,9 @@ pub(crate) fn convert_pyobj_into_operand(data: &PyAny) -> PyResult<OperandPy> {
     }
 }
 
-pub(crate) fn convert_pyobj_into_option_operand(data: &PyAny) -> PyResult<Option<OperandPy>> {
+pub(crate) fn convert_pyobj_into_option_operand<'a>(
+    data: &'a Bound<'a, PyAny>,
+) -> PyResult<Option<OperandPy<'a>>> {
     if data.is_none() {
         Ok(None)
     } else {
@@ -44,7 +48,7 @@ pub(crate) fn convert_pyobj_into_option_operand(data: &PyAny) -> PyResult<Option
     }
 }
 
-pub(crate) fn convert_pyobj_into_scalar(data: &PyAny) -> PyResult<ScalarValue> {
+pub(crate) fn convert_pyobj_into_scalar(data: &Bound<PyAny>) -> PyResult<ScalarValue> {
     if data.is_instance_of::<PyFloat>() {
         PyResult::Ok(data.extract::<f32>()?.into())
     } else if data.is_instance_of::<PyInt>() {
@@ -56,7 +60,7 @@ pub(crate) fn convert_pyobj_into_scalar(data: &PyAny) -> PyResult<ScalarValue> {
     }
 }
 
-pub(crate) fn convert_pyobj_into_array_u32(data: &PyAny) -> PyResult<Vec<u32>> {
+pub(crate) fn convert_pyobj_into_array_u32(data: &Bound<PyAny>) -> PyResult<Vec<u32>> {
     if data.is_instance_of::<PyInt>() {
         PyResult::Ok(vec![data.extract::<u32>()?])
     } else if data.is_instance_of::<PyList>() {
@@ -68,16 +72,17 @@ pub(crate) fn convert_pyobj_into_array_u32(data: &PyAny) -> PyResult<Vec<u32>> {
     }
 }
 
-pub(crate) fn convert_pyobj_into_vec_ndarray(data: &PyAny) -> PyResult<Vec<&NdArray>> {
+pub(crate) fn convert_pyobj_into_vec_ndarray<'a>(
+    data: &'a Bound<'a, PyAny>,
+) -> PyResult<Vec<Bound<NdArrayPy>>> {
     if data.is_instance_of::<PyList>() || data.is_instance_of::<PyTuple>() {
         let len = data.len()?;
-
         Ok(Python::with_gil(|_py| {
             let mut refs = vec![];
             for i in 0..len {
                 let item = data.get_item(i)?;
                 if item.is_instance_of::<NdArrayPy>() {
-                    refs.push(&item.downcast::<PyCell<NdArrayPy>>()?.get().ndarray)
+                    refs.push(item.downcast_into::<NdArrayPy>()?)
                 } else {
                     return PyResult::Err(PyTypeError::new_err(format!(
                         "Operation not supported for the given type {:?}",
@@ -96,7 +101,7 @@ pub(crate) fn convert_pyobj_into_vec_ndarray(data: &PyAny) -> PyResult<Vec<&NdAr
 
 #[pymodule]
 #[pyo3(name = "webgpupy")]
-fn webgpupy_module(py: Python, m: &PyModule) -> PyResult<()> {
+fn webgpupy_module(py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     pyo3_log::init();
     ufunc::create_py_items(m)?;
     logical::create_py_items(m)?;

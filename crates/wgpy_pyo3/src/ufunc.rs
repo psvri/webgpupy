@@ -24,12 +24,15 @@ impl Ufunc {
     }
 
     #[getter(__doc__)]
-    fn __doc__<'a>(&self, py: Python<'a>) -> PyResult<Py<PyString>> {
+    fn __doc__(&self, py: Python<'_>) -> PyResult<Py<PyString>> {
         let resources = py.import_bound("pkgutil")?;
         let function = resources.getattr(intern!(py, "get_data"))?;
         let args = ("webgpupy", self.doc_string_path);
         let result = function.call(args, None)?.getattr("decode")?;
-        let result_string = result.call1(("utf-8",))?.downcast_into::<PyString>()?.unbind();
+        let result_string = result
+            .call1(("utf-8",))?
+            .downcast_into::<PyString>()?
+            .unbind();
         PyResult::Ok(result_string)
     }
 
@@ -37,10 +40,10 @@ impl Ufunc {
     fn __call__(
         &self,
         py: Python<'_>,
-        args: &PyTuple,
-        kwargs: Option<&PyDict>,
+        args: &Bound<PyTuple>,
+        kwargs: Option<&Bound<PyDict>>,
     ) -> PyResult<PyObject> {
-        self.py_func.call(py, args, kwargs)
+        self.py_func.call_bound(py, args, kwargs)
     }
 
     fn __repr__(&self) -> String {
@@ -55,8 +58,8 @@ macro_rules! impl_ufunc_nin2_nout1 {
         #[pyo3(signature = (x, y, /, *, r#where = None, dtype=None))]
         pub fn $name<'a>(
             py: Python<'_>,
-            x: &'a PyAny,
-            y: &'a PyAny,
+            x: &'a Bound<'a, PyAny>,
+            y: &'a Bound<'a, PyAny>,
             r#where: Option<&NdArrayPy>,
             #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
         ) -> NdArrayPy {
@@ -76,7 +79,7 @@ macro_rules! impl_ufunc_nin1_nout1 {
         #[pyo3(signature = (x, /, *, r#where = None, dtype=None))]
         pub fn $name(
             py: Python<'_>,
-            x: &PyAny,
+            x: &Bound<PyAny>,
             r#where: Option<&NdArrayPy>,
             #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
         ) -> NdArrayPy {
@@ -128,7 +131,7 @@ macro_rules! add_ufunc_nin2_nout1 {
     };
 }
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_class::<Ufunc>()?;
     Ok(())
 }

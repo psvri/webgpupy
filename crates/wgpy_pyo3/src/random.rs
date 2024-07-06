@@ -37,10 +37,10 @@ pub fn create_py_items(m: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
-pub fn random_module(py: Python, parent_module: &PyModule) -> PyResult<()> {
-    let child_module = PyModule::new(py, "random")?;
+pub fn random_module(py: Python, parent_module: &Bound<PyModule>) -> PyResult<()> {
+    let child_module = PyModule::new_bound(py, "random")?;
     child_module.add_class::<ThreeFryPy>()?;
-    child_module.add_function(wrap_pyfunction!(default_rng, child_module)?)?;
-    parent_module.add_submodule(child_module)?;
+    child_module.add_function(wrap_pyfunction_bound!(default_rng, &child_module)?)?;
+    parent_module.add_submodule(&child_module)?;
     Ok(())
 }

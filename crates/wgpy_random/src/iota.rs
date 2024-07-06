@@ -27,6 +27,6 @@ mod test {
         let values = GPU_DEVICE.as_ref().retrive_data(&buffer);
 
         let result: Vec<u32> = bytemuck::cast_slice(&values).to_vec();
-        assert_eq!(result, (0..total).into_iter().collect::<Vec<u32>>())
+        assert_eq!(result, (0..total).collect::<Vec<u32>>())
     }
 }

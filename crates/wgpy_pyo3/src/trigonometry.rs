@@ -13,7 +13,7 @@ impl_ufunc_nin1_nout1!(_cos, webgpupy::cos);
 impl_ufunc_nin1_nout1!(_sin, webgpupy::sin);
 impl_ufunc_nin1_nout1!(_arccos, webgpupy::arccos);
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(_sin, m)?)?;
     m.add_function(wrap_pyfunction!(_cos, m)?)?;
     m.add_function(wrap_pyfunction!(_arccos, m)?)?;

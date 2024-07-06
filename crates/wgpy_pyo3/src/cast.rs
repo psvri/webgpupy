@@ -1,10 +1,11 @@
 use pyo3::{
     exceptions::PyRuntimeError,
+    prelude::*,
     types::{PyBool, PyFloat, PyInt},
-    PyAny, PyResult,
+    Bound, PyAny, PyResult,
 };
 pub trait PyObectToRustPrimitive {
-    fn into_rust(object: &PyAny) -> PyResult<Self>
+    fn into_rust(object: &Bound<PyAny>) -> PyResult<Self>
     where
         Self: Sized;
 }
@@ -12,7 +13,7 @@ pub trait PyObectToRustPrimitive {
 macro_rules! ImplPyObectToRustPrimitive {
     ($ty: ident) => {
         impl PyObectToRustPrimitive for $ty {
-            fn into_rust(object: &PyAny) -> PyResult<$ty> {
+            fn into_rust(object: &Bound<PyAny>) -> PyResult<$ty> {
                 if object.is_instance_of::<PyInt>() {
                     Ok(object.extract::<i64>()? as $ty)
                 } else if object.is_instance_of::<PyFloat>() {
@@ -37,7 +38,7 @@ ImplPyObectToRustPrimitive!(u32);
 ImplPyObectToRustPrimitive!(f32);
 
 impl PyObectToRustPrimitive for bool {
-    fn into_rust(object: &PyAny) -> PyResult<Self>
+    fn into_rust(object: &Bound<PyAny>) -> PyResult<Self>
     where
         Self: Sized,
     {

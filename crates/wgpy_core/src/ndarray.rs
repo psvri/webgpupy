@@ -286,11 +286,11 @@ mod test {
 
     #[test]
     fn test_get_items() {
-        let values = (0..300).into_iter().collect::<Vec<i32>>();
+        let values = (0..300).collect::<Vec<i32>>();
         let array = NdArray::from_slice(values.as_slice().into(), vec![10, 10, 3], None);
         let slices = vec![(1..3).into()];
 
-        let result = (30..90).into_iter().collect::<Vec<i32>>();
+        let result = (30..90).collect::<Vec<i32>>();
 
         let items = array.get_items(&slices);
 
@@ -301,7 +301,7 @@ mod test {
 
     #[test]
     fn test_get_items_mixed() {
-        let values = (0..300).into_iter().map(|x| x as f32).collect::<Vec<f32>>();
+        let values = (0..300).map(|x| x as f32).collect::<Vec<f32>>();
         let array = NdArray::from_slice(values.as_slice().into(), vec![10, 10, 3], None);
         let slices = vec![(5..7).into(), (1..2).into()];
 
@@ -317,10 +317,10 @@ mod test {
 
     #[test]
     fn test_get_items_all() {
-        let values = (0..300).into_iter().map(|x| x as f32).collect::<Vec<f32>>();
+        let values = (0..300).map(|x| x as f32).collect::<Vec<f32>>();
         let array = NdArray::from_slice(values.as_slice().into(), vec![10, 10, 3], None);
 
-        let items = array.get_items(&vec![(5..7).into(), (1..2).into(), (2..).into()]);
+        let items = array.get_items(&[(5..7).into(), (1..2).into(), (2..).into()]);
 
         assert_eq!(&items.shape, &[2, 1, 1]);
 
@@ -329,10 +329,10 @@ mod test {
 
     #[test]
     fn test_get_items_index() {
-        let values = (0..300).into_iter().map(|x| x as f32).collect::<Vec<f32>>();
+        let values = (0..300).map(|x| x as f32).collect::<Vec<f32>>();
         let array = NdArray::from_slice(values.as_slice().into(), vec![10, 10, 3], None);
 
-        let items = array.get_items(&vec![5.into(), 1.into()]);
+        let items = array.get_items(&[5.into(), 1.into()]);
 
         assert_eq!(&items.shape, &[3]);
 
@@ -344,14 +344,11 @@ mod test {
 
     #[test]
     fn test_get_items_last() {
-        let values = (0..1500)
-            .into_iter()
-            .map(|x| x as f32)
-            .collect::<Vec<f32>>();
+        let values = (0..1500).map(|x| x as f32).collect::<Vec<f32>>();
         let array = NdArray::from_slice(values.as_slice().into(), vec![10, 50, 3], None);
 
         for i in 0..3 {
-            let items = array.get_items(&vec![(0..).into(), (0..).into(), i.into()]);
+            let items = array.get_items(&[(0..).into(), (0..).into(), i.into()]);
 
             let result = (0..500)
                 .into_iter()

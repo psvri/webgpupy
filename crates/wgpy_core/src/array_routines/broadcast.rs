@@ -137,23 +137,11 @@ mod test {
 
     #[test]
     fn test_broadcast_shapes() {
-        assert_eq!(
-            broadcast_shape(&vec![1, 1, 1], &vec![3]).unwrap(),
-            vec![1, 1, 3]
-        );
-        assert_eq!(
-            broadcast_shape(&vec![1, 2, 1], &vec![3]).unwrap(),
-            vec![1, 2, 3]
-        );
-        assert_eq!(
-            broadcast_shape(&vec![4, 1, 3], &vec![2, 3]).unwrap(),
-            vec![4, 2, 3]
-        );
-        assert_eq!(
-            broadcast_shape(&vec![1, 3], &vec![2, 1]).unwrap(),
-            vec![2, 3]
-        );
-        assert!(broadcast_shape(&vec![2], &vec![3]).is_err())
+        assert_eq!(broadcast_shape(&[1, 1, 1], &[3]).unwrap(), vec![1, 1, 3]);
+        assert_eq!(broadcast_shape(&[1, 2, 1], &[3]).unwrap(), vec![1, 2, 3]);
+        assert_eq!(broadcast_shape(&[4, 1, 3], &[2, 3]).unwrap(), vec![4, 2, 3]);
+        assert_eq!(broadcast_shape(&[1, 3], &[2, 1]).unwrap(), vec![2, 3]);
+        assert!(broadcast_shape(&[2], &[3]).is_err())
     }
 
     fn test_broadcast(
@@ -172,37 +160,36 @@ mod test {
         test_broadcast(
             [1.0f32, 2.0, 3.0].as_ref().into(),
             vec![1, 1, 3],
-            &vec![1, 2, 3],
+            &[1, 2, 3],
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0].into(),
         );
 
         test_broadcast(
             [1.0f32].as_ref().into(),
             vec![1, 1, 1],
-            &vec![1, 2, 3],
+            &[1, 2, 3],
             vec![1.0f32; 6].into(),
         );
 
         test_broadcast(
             [1.0f32].as_ref().into(),
             vec![1],
-            &vec![1, 2, 3],
+            &[1, 2, 3],
             vec![1.0f32; 6].into(),
         );
 
         test_broadcast(
             [1.0f32, 2.0, 3.0].as_ref().into(),
             vec![3],
-            &vec![1, 2, 3],
+            &[1, 2, 3],
             vec![1.0f32, 2.0, 3.0, 1.0, 2.0, 3.0].into(),
         );
 
         test_broadcast(
             [1.0f32, 20.0, 33.0].as_ref().into(),
             vec![3],
-            &vec![10, 50, 3],
+            &[10, 50, 3],
             (0..10 * 50)
-                .into_iter()
                 .flat_map(|_| [1.0f32, 20.0, 33.0].into_iter())
                 .collect::<Vec<f32>>()
                 .into(),
@@ -211,14 +198,14 @@ mod test {
         test_broadcast(
             [1.0f32, 20.0].as_ref().into(),
             vec![1, 2, 1],
-            &vec![1, 2, 3],
+            &[1, 2, 3],
             vec![1.0f32, 1.0, 1.0, 20.0, 20.0, 20.0].into(),
         );
 
         test_broadcast(
             [1.0f32, 20.0, 30.0, 40.0].as_ref().into(),
             vec![2, 2, 1],
-            &vec![2, 2, 3],
+            &[2, 2, 3],
             vec![
                 1.0f32, 1.0, 1.0, 20.0, 20.0, 20.0, 30.0, 30.0, 30.0, 40.0, 40.0, 40.0,
             ]
