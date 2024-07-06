@@ -156,6 +156,7 @@ impl NdArrayPy {
 
 /// Creates a new array
 #[pyfunction(name = "ones")]
+#[pyo3(signature = (shape, dtype=None))]
 pub fn array_ones(
     py: Python<'_>,
     shape: Vec<u32>,
@@ -172,6 +173,7 @@ pub fn array_ones(
 
 /// Creates a new array
 #[pyfunction(name = "zeros")]
+#[pyo3(signature = (shape, dtype=None))]
 pub fn array_zeros(
     py: Python<'_>,
     shape: Vec<u32>,
@@ -188,6 +190,7 @@ pub fn array_zeros(
 
 /// Fills array with value
 #[pyfunction(name = "full")]
+#[pyo3(signature = (shape, data, dtype=None))]
 pub fn array_full(
     py: Python<'_>,
     shape: Vec<u32>,
@@ -238,7 +241,7 @@ fn to_list(
 fn slice_to_index_slice_op(subscripts: &Bound<PyAny>, length: i32) -> PyResult<IndexSliceOp> {
     let slice = subscripts.downcast::<PySlice>()?;
     // Test fails in CI without into 🤔
-    let indices = slice.indices(length.into())?;
+    let indices = slice.indices(length as isize)?;
     Ok((
         indices.start as i64..indices.stop as i64,
         indices.step as i32,
@@ -386,6 +389,7 @@ pub fn into_scalar_array(data: &Bound<PyAny>, dtype: Dtype) -> PyResult<NdArrayP
 
 /// Creates a new array
 #[pyfunction(name = "array")]
+#[pyo3(signature = (data, dtype=None))]
 pub fn array(
     data: &Bound<PyAny>,
     #[pyo3(from_py_with = "into_optional_dtypepy")] dtype: Option<Cow<DtypePy>>,
@@ -401,6 +405,7 @@ pub fn array(
 
 /// Creates a new array
 #[pyfunction(name = "broadcast_to")]
+
 pub fn broadcast_to(data: &Bound<PyAny>, shape: Vec<u32>) -> PyResult<NdArrayPy> {
     let array = convert_pyobj_into_operand(data)?;
     Ok(NdArrayPy {
@@ -410,6 +415,7 @@ pub fn broadcast_to(data: &Bound<PyAny>, shape: Vec<u32>) -> PyResult<NdArrayPy>
 
 /// Repeats elements in an array
 #[pyfunction(name = "repeat")]
+#[pyo3(signature = (data, repeats, axis=None))]
 pub fn repeat(
     data: &Bound<PyAny>,
     #[pyo3(from_py_with = "convert_pyobj_into_array_u32")] repeats: Vec<u32>,

@@ -32,7 +32,7 @@ pub fn default_rng() -> PyResult<ThreeFryPy> {
     Ok(ThreeFryPy::new(0))
 }
 
-pub fn create_py_items(m: &PyModule) -> PyResult<()> {
+pub fn create_py_items(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_class::<ThreeFryPy>()?;
     Ok(())
 }
