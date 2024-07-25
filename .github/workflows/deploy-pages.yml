@@ -27,6 +27,7 @@ jobs:
       - name: Build GitHub Pages
         working-directory: crates/wgpy_pyo3
         run: |
+          rustup update
           sudo apt install pandoc -y
           pip install -r requirements-dev.txt
           maturin build --out dist --find-interpreter
