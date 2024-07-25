@@ -1,6 +1,6 @@
 use arrow_gpu::gpu_utils::GpuDevice;
-use once_cell::sync::Lazy;
 use std::sync::Arc;
+use std::sync::LazyLock;
 
 pub(crate) mod array_routines;
 pub(crate) mod errors;
@@ -18,4 +18,4 @@ pub use operand::*;
 pub use types::*;
 pub use ufunc::*;
 
-pub static GPU_DEVICE: Lazy<Arc<GpuDevice>> = Lazy::new(|| Arc::new(GpuDevice::new()));
+pub static GPU_DEVICE: LazyLock<Arc<GpuDevice>> = LazyLock::new(|| Arc::new(GpuDevice::new()));

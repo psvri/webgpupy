@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 arrow_gpu = {workspace=true}
 wgpu = {workspace=true}
-once_cell = {workspace = true}
