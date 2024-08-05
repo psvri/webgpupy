@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.astype
+=======================
+
+.. currentmodule:: webgpupy
+
+method
+
+.. automethod:: webgpupy.ndarray.astype
+
