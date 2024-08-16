@@ -15,12 +15,12 @@ edition = "2021"
 [workspace.dependencies]
 pyo3 = { version = "0.22.2", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
-arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "2dc3367818c0264f72af4642d85d884ee6d27f41"}
-wgpu = "22.0.0"
-bytemuck = "1.16.3"
+arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "f16d71011bf10566d538c90b6bf11e0a08ea779a"}
+wgpu = "22.1.0"
+bytemuck = "1.17.0"
 
 [profile.release]
-debug=1
+debug=2
 
 [profile.bench]
 debug=1
