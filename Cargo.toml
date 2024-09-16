@@ -13,7 +13,7 @@ members = [
 edition = "2021"
 
 [workspace.dependencies]
-pyo3 = { version = "0.22.2", features = ["extension-module"] }
+pyo3 = { version = "0.22.3", features = ["extension-module"] }
 #arrow_gpu = { path="../arrow-gpu/crates/arrow"}
 arrow_gpu = { git="https://github.com/psvri/arrow-gpu.git", rev = "f16d71011bf10566d538c90b6bf11e0a08ea779a"}
 wgpu = "22.1.0"
