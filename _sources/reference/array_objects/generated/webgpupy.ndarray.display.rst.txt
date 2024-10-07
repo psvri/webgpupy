@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.display
+========================
+
+.. currentmodule:: webgpupy
+
+method
+
+.. automethod:: webgpupy.ndarray.display
+

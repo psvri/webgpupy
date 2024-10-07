@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: '**/requirements*.txt'
+      - name: Setup Environment
+        shell: bash
+        run: |
+          sudo apt-fast update
+          sudo apt-fast install -f -y mesa-vulkan-drivers libegl1-mesa-dev
+          rustup update
+      - name: Set up nextest and llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest,cargo-llvm-cov
+      - uses: Swatinem/rust-cache@v2
+      - name: rust cargo tests
+        run: |
+          source <(cargo llvm-cov show-env --export-prefix)
+          export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
+          export CARGO_INCREMENTAL=1
+          cargo llvm-cov clean --workspace
+          cargo nextest run --status-level all --no-fail-fast
+      - name: python test
+        working-directory: crates/wgpy_pyo3
+        run: |
+          python --version
+          source <(cargo llvm-cov show-env --export-prefix)
+          export CARGO_TARGET_DIR=$CARGO_LLVM_COV_TARGET_DIR
+          export CARGO_INCREMENTAL=1
+          pip install -r requirements-dev.txt
+          maturin build --out dist --find-interpreter
+          pip install webgpupy --find-links dist --force-reinstall
+          pytest -v -n auto --cov=webgpupy --cov-report xml
+      - name: create lcov
+        run: |
+          source <(cargo llvm-cov show-env --export-prefix)
+          cargo llvm-cov --no-run --lcov --output-path coverage.lcov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.lcov,crates/wgpy_pyo3/coverage.xml
+
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: PyO3/maturin-action@v1
+  #       with:
+  #         command: build
+  #         args: --release -o dist --find-interpreter
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: dist
+
+  # macos:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: PyO3/maturin-action@v1
+  #       with:
+  #         command: build
+  #         args: --release -o dist --universal2 --find-interpreter
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: dist
+#
+#  release:
+#    name: Release
+#    runs-on: ubuntu-latest
+#    if: "startsWith(github.ref, 'refs/tags/')"
+#    needs: [ macos, windows, linux ]
+#    steps:
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: wheels
+#      - name: Publish to PyPI
+#        uses: PyO3/maturin-action@v1
+#        env:
+#          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+#        with:
+#          command: upload
+#          args: --skip-existing *
