@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.flatten
+========================
+
+.. currentmodule:: webgpupy
+
+method
+
+.. automethod:: webgpupy.ndarray.flatten
+

@@ -1,0 +1,6 @@
+﻿webgpupy.sin
+============
+
+.. currentmodule:: webgpupy
+
+.. autodata:: sin

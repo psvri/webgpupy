@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.tolist
+=======================
+
+.. currentmodule:: webgpupy
+
+method
+
+.. automethod:: webgpupy.ndarray.tolist
+

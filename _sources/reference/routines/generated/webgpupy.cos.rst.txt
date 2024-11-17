@@ -1,0 +1,6 @@
+﻿webgpupy.cos
+============
+
+.. currentmodule:: webgpupy
+
+.. autodata:: cos

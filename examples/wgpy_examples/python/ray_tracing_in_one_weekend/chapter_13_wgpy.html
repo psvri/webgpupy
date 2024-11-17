@@ -1,0 +1,907 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 13 &#8212; webgpupy</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/wgpy_examples/python/ray_tracing_in_one_weekend/chapter_13_wgpy';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="prev" title="Chapter 12" href="chapter_12_wgpy.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">webgpupy</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/psvri/webgpupy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/psvri/webgpupy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="readme.html">Ray Tracing In One Weekend</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chapter_2_wgpy.html">Chapter 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_4_wgpy.html">Chapter 4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_5_wgpy.html">Chapter 5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_7_wgpy.html">Chapter 7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_8_wgpy.html">Chapter 8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_9_wgpy.html">Chapter 9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_10_wgpy.html">Chapter 10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_11_wgpy.html">Chapter 11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapter_12_wgpy.html">Chapter 12</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Chapter 13</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="readme.html" class="nav-link">Ray Tracing In One Weekend</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Chapter 13</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Chapter-13">
+<h1>Chapter 13<a class="headerlink" href="#Chapter-13" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from PIL import Image
+import webgpupy as np
+from functools import reduce
+from random import random
+from math import radians, tan, pi, cos
+from time import time
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>class Vec3:
+    def __new__(cls, x: float=0, y:float=0, z:float=0):
+        return np.array([x, y, z], dtype=&#39;float32&#39;)
+
+Point3=Vec3
+Color=Vec3
+
+class VecUtils:
+    @staticmethod
+    def x(data):
+        image_height = data.shape[0]
+        image_width = data.shape[1]
+        return data[:,:,0].reshape((image_height, image_width, 1))
+
+    @staticmethod
+    def y(data):
+        image_height = data.shape[0]
+        image_width = data.shape[1]
+        return data[:,:,1].reshape((image_height, image_width, 1))
+
+    @staticmethod
+    def z(data):
+        image_height = data.shape[0]
+        image_width = data.shape[1]
+        return data[:,:,2].reshape((image_height, image_width, 1))
+
+    @staticmethod
+    def unit_vector(data):
+        e0 = VecUtils.x(data)
+        e1 = VecUtils.y(data)
+        e2 = VecUtils.z(data)
+        return data / np.sqrt((e0*e0+e1*e1+e2*e2))
+
+    @staticmethod
+    def dot(data1, data2):
+        data1_x = VecUtils.x(data1)
+        data1_y = VecUtils.y(data1)
+        data1_z = VecUtils.z(data1)
+        data2_x = VecUtils.x(data2)
+        data2_y = VecUtils.y(data2)
+        data2_z = VecUtils.z(data2)
+        return data1_x * data2_x + data1_y * data2_y + data1_z * data2_z
+
+    @staticmethod
+    def cross(data1, data2):
+        return np.cross(data1, data2)
+
+    @staticmethod
+    def length_squared(data):
+        return VecUtils.dot(data, data)
+
+    @staticmethod
+    def length(data):
+        return np.sqrt(VecUtils.dot(data, data))
+
+    @staticmethod
+    def near_zero(data):
+        s = 1e-8
+        data = np.absolute(data)
+        e0 = VecUtils.x(data) &lt; s
+        e1 = VecUtils.y(data) &lt; s
+        e2 = VecUtils.z(data) &lt; s
+
+        result = np.bitwise_and(e0, e1)
+        return np.bitwise_and(result, e2)
+
+    @staticmethod
+    def reflect(v, n):
+        return v - 2.0*VecUtils.dot(v,n)*n
+
+    @staticmethod
+    def refract(uv, n, etai_over_etat):
+        cos_theta = np.minimum(VecUtils.dot(-uv, n), 1.0)
+        r_out_perp =  etai_over_etat * (uv + cos_theta*n)
+        r_out_parallel = -np.sqrt(np.absolute(1.0 - VecUtils.length_squared(r_out_perp))) * n
+        return r_out_perp + r_out_parallel
+
+class Rays:
+    def __init__(self, origin, direction) -&gt; None:
+        self.orig = origin
+        self.dir = direction
+
+    def origin(self):
+        return self.orig
+
+    def direction(self):
+        return self.dir
+
+    def at(self, t):
+        return self.orig + t*self.dir
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>FARAWAY = np.array([1.0e37])
+rng = np.random.default_rng()
+t_min = 0.001
+
+def convert_to_image(pixels, samples_per_pixel):
+    print(pixels.shape)
+    pixels = pixels/float(samples_per_pixel)
+    pixels = np.sqrt(pixels)
+    pixels = np.clip(pixels, 0.0, 0.999)
+    pixels = (pixels * 255.0).astype(&#39;uint8&#39;)
+    pixels = pixels.tolist()
+    print(time() - start)
+    import numpy
+    image_array = numpy.array(pixels, dtype= &#39;uint8&#39;)
+    return Image.fromarray(image_array, &#39;RGB&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def random_array(shape):
+    return rng.random(shape)
+
+def random_array_bn(shape, min_value, max_value):
+    return min_value + (max_value -(min_value)) * random_array(shape)
+
+def random_in_unit_sphere(shape):
+    rand_array = random_array_bn(shape, -1.0, 1.0)
+    unit_rand_array = VecUtils.unit_vector(rand_array)
+    length_squared = VecUtils.length_squared(rand_array)
+    valid_rands = length_squared &lt; 1.0
+    rand_array = np.where(valid_rands, rand_array, unit_rand_array)
+    return rand_array
+
+def random_unit_vector(shape):
+    return VecUtils.unit_vector(random_in_unit_sphere(shape))
+
+def random_in_unit_disk(shape):
+    x = np.broadcast_to(np.array([1.0, 0.0, 0.0]), shape)
+    y = np.broadcast_to(np.array([0.0, 1.0, 0.0]), shape)
+    r1 = random_array_bn(shape, -1.0, 1.0)
+    r2 = random_array_bn(shape, -1.0, 1.0)
+    rand_array = x * r1 + y * r2
+    unit_rand_array = VecUtils.unit_vector(rand_array)
+    length_squared = VecUtils.length_squared(rand_array)
+    valid_rands = length_squared &lt;1.0
+    rand_array = np.where(valid_rands, rand_array, unit_rand_array)
+    return rand_array
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>class Lambertian:
+    def __init__(self, color) -&gt; None:
+        self.albedo = color
+
+    def scatter(self, r_in: Rays, normal, front_face, hit):
+        shape = r_in.origin().shape
+        attenuation = np.broadcast_to(self.albedo, shape)
+        scatter_direction = normal + random_unit_vector(shape)
+
+        scatter_direction = np.where(VecUtils.near_zero(scatter_direction), normal, scatter_direction)
+        attenuation = np.where(hit, attenuation, 0.0)
+        scatter_direction  = np.where(hit, scatter_direction, 0.0)
+        return (attenuation, scatter_direction, hit)
+
+class Metal:
+    def __init__(self, color, fuzz: float) -&gt; None:
+        self.albedo = color
+        self.fuzz = min(fuzz, 1.0)
+
+    def scatter(self, r_in: Rays, normal, front_face, hit):
+        shape = r_in.origin().shape
+        attenuation = np.broadcast_to(self.albedo, shape)
+        reflected = VecUtils.reflect(VecUtils.unit_vector(r_in.direction()), normal)
+        reflected += self.fuzz * random_in_unit_sphere(reflected.shape)
+
+        hit = np.bitwise_and(VecUtils.dot(reflected, normal) &gt; 0.0, hit)
+        attenuation = np.where(hit, attenuation, 0.0)
+        reflected = np.where(hit, reflected, 0.0)
+        return (attenuation, reflected, hit)
+
+class Dielectric:
+    def __init__(self, index_of_refraction: float) -&gt; None:
+        self.ir = index_of_refraction
+
+    def scatter(self, r_in: Rays, normal, front_face, hit):
+        shape = r_in.origin().shape
+        attenuation = np.ones(shape)
+        attenuation = np.where(hit, attenuation, 0.0)
+        refraction_ratio = np.broadcast_to(np.array(self.ir), normal.shape)
+        refraction_ratio = np.where(front_face, (1.0/refraction_ratio), refraction_ratio)
+
+        unit_direction = VecUtils.unit_vector(r_in.direction())
+
+        cos_theta = np.minimum(VecUtils.dot(-unit_direction, normal), 1.0)
+        sin_theta = np.sqrt(1.0 - cos_theta*cos_theta)
+        cannot_refract = refraction_ratio * sin_theta &gt; 1.0
+        cannot_refract = np.bitwise_or(cannot_refract, self._reflectance(cos_theta, refraction_ratio) &gt; random())
+
+        direction = np.where(cannot_refract,
+                             VecUtils.reflect(unit_direction, normal),
+                             VecUtils.refract(unit_direction, normal, refraction_ratio))
+
+        direction = np.where(hit, direction, 0.0)
+        return (attenuation, direction, hit)
+
+    @classmethod
+    def _reflectance(cls, cosine, ref_idx):
+        r0 = (1.0-ref_idx) / (1.0+ref_idx)
+        r0 = r0*r0
+        return r0 + (1.0-r0)*np.power((1.0 - cosine),5.0)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>class Sphere:
+    def __init__(self, center, radius: float, material) -&gt; None:
+        self.radius = radius
+        self.center = center
+        self.material = material
+
+    def hit(self, r: Rays):
+        oc = r.origin() - self.center
+        a = VecUtils.dot(r.direction(), r.direction())
+        half_b = VecUtils.dot(oc, r.direction())
+        c = VecUtils.dot(oc, oc) - self.radius*self.radius
+        discriminant = half_b*half_b - a*c
+
+        sqrtd = np.sqrt(np.maximum(0.0, discriminant))
+
+        root1 = (-half_b - sqrtd) / a
+        root2 = (-half_b + sqrtd) / a
+        root = np.where((root1 &gt; 0.0) &amp; (root1 &lt; root2), root1, root2)
+        pred = (discriminant &gt; 0.0) &amp; (root &gt; 0.0)
+        return np.where(pred, root, FARAWAY)
+
+    def color(self, r: Rays, t, hit):
+        t = t * hit.astype(&#39;float32&#39;)
+        hit_point = r.at(t)
+        outward_normal = (hit_point - self.center) / self.radius
+        front_face = VecUtils.dot(r.direction(), outward_normal) &lt; 0.0
+        normal = np.where(front_face, outward_normal, -outward_normal)
+        normal = np.where(hit, normal, 0.0)
+
+        return self.material.scatter(r, normal, front_face, hit)
+
+class World:
+    def __init__(self) -&gt; None:
+        self.hittable_list = []
+
+    def add(self, object):
+        self.hittable_list.append(object)
+
+    def color(self, rays: Rays):
+
+        t_values = []
+
+        for object in self.hittable_list:
+            t_values.append(object.hit(rays))
+
+        nearest = reduce(np.minimum, t_values)
+        nearest = np.maximum(nearest, 0.001)
+        image_shape = rays.origin().shape
+        color = np.zeros(image_shape)
+        ray_direction = np.zeros(image_shape)
+        new_hit = np.zeros(nearest.shape, dtype=&#39;bool&#39;)
+        for (s, t) in zip(self.hittable_list, t_values):
+            sphere_hit = (nearest != FARAWAY) &amp; (t == nearest)
+            if np.any(sphere_hit):
+                (attenuation, scatter_direction, ray_hit) = s.color(rays, t, sphere_hit)
+                color += attenuation
+                ray_direction += scatter_direction
+                new_hit = np.bitwise_or(new_hit, ray_hit)
+
+        t_values = nearest * new_hit.astype(&#39;float32&#39;)
+        ray_direction = np.where(new_hit, ray_direction, rays.direction())
+        return (color, t_values, ray_direction, new_hit)
+
+class Camera:
+    def __init__(self,
+                 lookfrom,
+                 lookat,
+                 vup,
+                 vfov, #vertical field-of-view in degrees
+                 aspect_ratio,
+                 aperture,
+                 focus_dist,
+                 image_width,
+                 image_height) -&gt; None:
+        theta = radians(vfov)
+        h = tan(theta/2)
+        viewport_height = 2.0  * h
+        viewport_width = aspect_ratio * viewport_height
+
+        self.w = VecUtils.unit_vector(lookfrom - lookat)
+        self.u = VecUtils.unit_vector(VecUtils.cross(vup, self.w))
+        self.v = VecUtils.cross(self.w, self.u)
+
+        self.origin = np.broadcast_to(lookfrom, ((image_height, image_width, 3)))
+        self.horizontal = np.broadcast_to(self.u* viewport_width, ((image_height, image_width, 3))) * focus_dist
+        self.vertical = np.broadcast_to(self.v* viewport_height, ((image_height, image_width, 3))) * focus_dist
+        self.lower_left_corner = self.origin - self.horizontal/2.0 - self.vertical/2.0 - self.w * focus_dist
+
+        self.lens_radius = aperture / 2.0
+
+    def get_ray(self, s, t):
+        rd = self.lens_radius * random_in_unit_disk(self.origin.shape)
+        offset = self.u * VecUtils.x(rd) + self.v * VecUtils.y(rd)
+        return Rays(self.origin + offset,
+                    self.lower_left_corner + s*self.horizontal + t*self.vertical - self.origin - offset)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def ray_color(shape, rays: Rays, world, depth):
+
+    if (depth &lt;= 0):
+        return np.zeros(shape)
+
+    (world_color, t_values, ray_direction, hit) = world.color(rays)
+    not_hit = np.invert(hit)
+    if np.any(hit):
+        hit_points = rays.at(t_values)
+        world_color = world_color * ray_color(shape, Rays(hit_points, ray_direction), world, depth-1)
+
+    dir = rays.direction()
+    unit_direction = VecUtils.unit_vector(dir)
+    t = 0.5*(VecUtils.y(unit_direction) + 1.0)
+    is_not_hit_color = ((1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(0.5, 0.7, 1.0)) * not_hit.astype(&quot;float32&quot;)
+    return world_color + is_not_hit_color
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>image_height = 360
+aspect_ratio = 16/9
+image_width = int(image_height * aspect_ratio)
+samples_per_pixel = 10
+max_depth = 5
+start = time()
+
+u = np.array([[i/(image_width - 1) for i in range(0, image_width)]])
+u = np.repeat(u, image_height, axis=0).reshape([image_height, image_width, 1])
+v = np.array([i/(image_height - 1) for i in range(image_height-1, -1, -1)]).reshape([image_height, 1])
+v = np.repeat(v, image_width, axis=1).reshape([image_height, image_width, 1])
+
+R = cos(pi/4)
+lookfrom = np.array([[[-2.0, 2.0, 1.0]]])
+lookat = np.array([[[0.0, 0.0,-1.0]]])
+vup = np.array([[[0.0, 1.0, 0.0]]])
+dist_to_focus = VecUtils.length(lookfrom - lookat)
+aperture = 2.0
+cam = Camera(
+    lookfrom,
+    lookat,
+    vup,
+    20,
+    aspect_ratio,
+    aperture,
+    dist_to_focus,
+    image_width,
+    image_height
+)
+
+world = World()
+material_ground = Lambertian(Color(0.8, 0.8, 0.0))
+material_center = Lambertian(Color(0.1, 0.2, 0.5))
+material_left   = Dielectric(1.5)
+material_right  = Metal(Color(0.8, 0.6, 0.2), 0.0)
+
+world.add(Sphere(Point3( 0.0, -100.5, -1.0), 100.0, material_ground))
+world.add(Sphere(Point3( 0.0,    0.0, -1.0),   0.5, material_center))
+world.add(Sphere(Point3(-1.0,    0.0, -1.0),   0.5, material_left))
+world.add(Sphere(Point3(-1.0,    0.0, -1.0), -0.45, material_left))
+world.add(Sphere(Point3( 1.0,    0.0, -1.0),   0.5, material_right))
+
+pixels = np.zeros((image_height, image_width, 3))
+time_take_per_sample = start
+for i in range(0, samples_per_pixel):
+    new_u = u + (random_array(u.shape) / float(image_width - 1))
+    new_v = v + (random_array(v.shape) / float(image_height - 1))
+    rays = cam.get_ray(new_u, new_v)
+    pixels += ray_color((image_height, image_width, 3), rays, world, max_depth)
+    time_take_per_sample = time() - time_take_per_sample
+    print(f&#39;finished sample {i} in {time_take_per_sample}s&#39;, end=&#39;\r&#39;)
+    time_take_per_sample = time()
+print()
+
+convert_to_image(pixels, samples_per_pixel)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+finished sample 9 in 1.9095172882080078s
+[360, 640, 3]
+18.955835103988647
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../_images/examples_wgpy_examples_python_ray_tracing_in_one_weekend_chapter_13_wgpy_8_1.png" src="../../../../_images/examples_wgpy_examples_python_ray_tracing_in_one_weekend_chapter_13_wgpy_8_1.png" />
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chapter_12_wgpy.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chapter 12</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, psvri.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

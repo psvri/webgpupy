@@ -1,0 +1,11 @@
+:orphan:
+
+webgpupy.ndarray.dtype
+======================
+
+.. currentmodule:: webgpupy
+
+attribute
+
+.. autoattribute:: webgpupy.ndarray.dtype
+
