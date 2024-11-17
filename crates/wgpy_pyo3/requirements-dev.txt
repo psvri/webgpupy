@@ -5,6 +5,6 @@ pytest-cov==6.0.0
 pytest-xdist==3.6.1
 numpydoc==1.8.0
 sphinx-copybutton==0.5.2
-pydata-sphinx-theme==0.15.4
+pydata-sphinx-theme==0.16.0
 nbsphinx==0.9.5
 jax[cpu]==0.4.31
